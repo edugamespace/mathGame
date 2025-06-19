@@ -7,8 +7,7 @@ while (problems.length < 20) {
   const answer = num + 5;
 
 
-
-
+  
   problems.push({
     image: `images/problems/plus_${num}_5.png`,
     answer: answer
@@ -50,7 +49,7 @@ function loadProblem(index) {
   const options = [];
   const offset = Math.floor(Math.random() * 4); // 0~3
   for (let i = correct - 2 + offset; i <= correct + 2 + offset; i++) {
-    if (i >= 1 && i <= 100) options.push(i);
+    if (i >= 1 && i <= 102) options.push(i);
   }
   const unique = [...new Set(options)];
   const choices = unique.slice(0, 5);

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Plus 2 Game</title>
+  <title>Plus 1~5_1to20 Game</title>
   <style>
     body {
       font-family: 'Arial', sans-serif;
@@ -38,14 +38,17 @@
     }
  #problem-card {
   border-radius: 30px;
-  overflow: hidden;       /* 중요: 넘치는 자식 둥글게 자르기 */
+  overflow: hidden;
   box-shadow: none;
   padding: 0;
+  margin: 0;
+  background: none;          /* ✅ 꼭 추가 */
+  display: inline-block;     /* ✅ 크기를 콘텐츠에 딱 맞게 */
 }
-
 #problemImage {
-  max-width: 100%;
-  max-height: 100%;
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
     #game-container {

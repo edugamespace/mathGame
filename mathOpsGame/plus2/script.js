@@ -7,11 +7,7 @@ while (problems.length < 20) {
   const answer = num + 2;
 
 
-  // 정답이 너무 작거나 너무 클 경우 제외
-  if ([99, 100].includes(answer)) {
-    continue; // skip
-  }
-
+  
   problems.push({
     image: `images/problems/plus_${num}_2.png`,
     answer: answer
@@ -53,7 +49,7 @@ function loadProblem(index) {
   const options = [];
   const offset = Math.floor(Math.random() * 4); // 0~3
   for (let i = correct - 2 + offset; i <= correct + 2 + offset; i++) {
-    if (i >= 1 && i <= 100) options.push(i);
+    if (i >= 1 && i <= 102) options.push(i);
   }
   const unique = [...new Set(options)];
   const choices = unique.slice(0, 5);

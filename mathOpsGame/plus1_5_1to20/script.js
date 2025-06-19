@@ -3,25 +3,32 @@ const startTime = Date.now();
 const problems = [];
 
 while (problems.length < 20) {
-  const num = Math.floor(Math.random() * 68) + 30; // 30~97
-  const type = Math.floor(Math.random() * 3) + 1; // 1~3
+  const num = Math.floor(Math.random() * 20) + 1; // 1~20
+  const type = Math.floor(Math.random() * 5) + 1; // 1~5
 
   let answer, image;
 
   if (type === 1) {
-    answer = num + 1;
-    if (answer > 100) continue;
-    image = `images/problems/plus_${num}_1.png`;
-  } else if (type === 2) {
-    answer = num + 2;
-    if (answer > 100) continue;
-    image = `images/problems/plus_${num}_2.png`;
-  } else {
-    answer = num + 3;
-    if (answer > 100) continue;
-    image = `images/problems/plus_${num}_3.png`;
-  }
-
+  answer = num + 1;
+  if (answer > 100) continue;
+  image = `images/problems/plus_${num}_1.png`;
+} else if (type === 2) {
+  answer = num + 2;
+  if (answer > 100) continue;
+  image = `images/problems/plus_${num}_2.png`;
+} else if (type === 3) {
+  answer = num + 3;
+  if (answer > 100) continue;
+  image = `images/problems/plus_${num}_3.png`;
+} else if (type === 4) {
+  answer = num + 4;
+  if (answer > 100) continue;
+  image = `images/problems/plus_${num}_4.png`;
+} else { // type === 5
+  answer = num + 5;
+  if (answer > 100) continue;
+  image = `images/problems/plus_${num}_5.png`;
+}
   problems.push({ image, answer });
 }
 
@@ -60,32 +67,26 @@ function loadProblem(index) {
   const options = [];
   const offset = Math.floor(Math.random() * 4); // 0~3
   for (let i = correct - 2 + offset; i <= correct + 2 + offset; i++) {
-    if (i >= 1 && i <= 102) options.push(i);
+    if (i >= 1 && i <= 100) options.push(i);
   }
   const unique = [...new Set(options)];
   const choices = unique.slice(0, 5);
-  if (!choices.includes(correct)) 
-    choices[Math.floor(Math.random() * 5)] = correct;
+  if (!choices.includes(correct)) choices[Math.floor(Math.random() * 5)] = correct;
 
   container.innerHTML = '';
-
-
-// 🎨 문제 단위로 색깔 랜덤
-  const pastelColors = ['#fee1e1', '#fce5ce', '#fefbc2', '#e4febd', '#d2fee5', '#d2fee5', '#e3e1fe', '#dce3fd', '#f3e1fe'];
+  
+// 문제 단위 색상 1개 선택
+  const pastelColors = ['#fde6e6', '#f9ebe1', '#fcf0d4', '#fbfcd4', '#dfe9cd', '#e1fef6', '#bee7ee', '#dce3fd', '#e5ddfd', '#fef0fc'];
   const problemColor = pastelColors[Math.floor(Math.random() * pastelColors.length)];
 
   choices.sort(() => Math.random() - 0.5).forEach(n => {
     const card = document.createElement('div');
     card.className = 'card';
-    card.style.backgroundColor = problemColor; // 문제 단위로 동일한 색상
+    card.style.backgroundColor = problemColor;
 
     const img = document.createElement('img');
     img.src = `images/answers/${n}.png`;
     card.appendChild(img);
-
-
-
-
 
     card.onclick = () => {
       if (n === correct) {
