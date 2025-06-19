@@ -6,6 +6,7 @@ while (problems.length < 20) {
   const num = Math.floor(Math.random() * 95) + 5; // 1~95
   const answer = num + 5;
 
+  if (answer > 100) continue; // 안전하게 한 번 더 걸러줌
 
   
   problems.push({

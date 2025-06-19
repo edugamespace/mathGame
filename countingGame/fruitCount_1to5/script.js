@@ -74,27 +74,23 @@ function updateProgressBar() {
 
 function showResult() {
   const correctCount = score.filter(s => s === 'correct').length;
+  const percent = Math.round((correctCount / totalQuestions) * 100);
 
-  const container = document.body;
-  container.innerHTML = '';
+  const textEl = document.getElementById('final-score-text');
+  const messageEl = document.getElementById('final-score-message');
+  const celebrationEl = document.getElementById('celebration');
 
-  const resultText = document.createElement('div');
-  resultText.textContent = `점수: ${correctCount} / ${totalQuestions}`;
-  resultText.style.fontSize = '50px';
-  resultText.style.fontWeight = 'bold';
-  resultText.style.marginBottom = '40px';
-  resultText.style.textAlign = 'center';
+  textEl.textContent = `${percent}점`;
 
-  const restartBtn = document.createElement('button');
-  restartBtn.textContent = '다시 해볼래요';
-  restartBtn.style.padding = '12px 24px';
-  restartBtn.style.fontSize = '30px';
-  restartBtn.style.borderRadius = '8px';
-  restartBtn.style.cursor = 'pointer';
-  restartBtn.onclick = restartGame;
+  if (percent >= 55) {
+    messageEl.textContent = '🎉 참 잘했어요!';
+    messageEl.style.color = '#72defc';
+  } else {
+    messageEl.textContent = '😊 조금 더 연습해 볼까요?';
+    messageEl.style.color = '#fc9373';
+  }
 
-  container.appendChild(resultText);
-  container.appendChild(restartBtn);
+  celebrationEl.style.display = 'flex';
 }
 
 function restartGame() {

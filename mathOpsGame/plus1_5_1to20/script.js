@@ -5,32 +5,14 @@ const problems = [];
 while (problems.length < 20) {
   const num = Math.floor(Math.random() * 20) + 1; // 1~20
   const type = Math.floor(Math.random() * 5) + 1; // 1~5
+  const answer = num + type;
 
-  let answer, image;
+  // 이미지 파일이 실제로 존재하는 범위를 확인하려면, 서버에서 목록 제한 필요
+  const image = `images/problems/plus_${num}_${type}.png`;
 
-  if (type === 1) {
-  answer = num + 1;
-  if (answer > 100) continue;
-  image = `images/problems/plus_${num}_1.png`;
-} else if (type === 2) {
-  answer = num + 2;
-  if (answer > 100) continue;
-  image = `images/problems/plus_${num}_2.png`;
-} else if (type === 3) {
-  answer = num + 3;
-  if (answer > 100) continue;
-  image = `images/problems/plus_${num}_3.png`;
-} else if (type === 4) {
-  answer = num + 4;
-  if (answer > 100) continue;
-  image = `images/problems/plus_${num}_4.png`;
-} else { // type === 5
-  answer = num + 5;
-  if (answer > 100) continue;
-  image = `images/problems/plus_${num}_5.png`;
-}
   problems.push({ image, answer });
 }
+
 
 
 const correctSound = new Audio('sounds/correct.mp3');

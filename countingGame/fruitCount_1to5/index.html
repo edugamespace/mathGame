@@ -64,12 +64,59 @@
   object-fit: cover;    /* 넘치는 부분 잘라내되 꽉 채우기 */
   border-radius: 20px;  /* 이미지 자체도 둥글게 */
 }
+
+    #celebration {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.95);
+      z-index: 1000;
+    }
+
+    #final-score-text {
+      font-size: 150px;
+      color: #000;
+      margin-bottom: 20px;
+    }
+    #final-score-message {
+      font-size: 36px;
+      margin-bottom: 30px;
+    }
+
+    #celebration button {
+      padding: 14px 28px;
+      font-size: 20px;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      margin: 10px;
+      cursor: pointer;
+    }
+
+    .retry-btn {
+      background-color: #3b82f6;
+    }
+
+    .exit-btn {
+      background-color: #ef4444;
+    }
   </style>
 </head>
 <body>
   <div id="progress-bar"></div>
   <div id="number-image"></div>
   <div id="choices"></div>
+  <div id="celebration">
+  <div id="final-score-text"></div>
+  <div id="final-score-message"></div>
+  <button class="retry-btn" onclick="location.reload()">다시 할게요</button>
+  <button class="exit-btn" onclick="window.location.href='https://raimtree.tistory.com/entry/%EB%8B%AC%EB%A0%A5%EA%B3%BC-%EC%8B%9C%EA%B3%84'">그만 할래요</button>
+</div>
   <script src="script.js"></script>
 </body>
 </html>
