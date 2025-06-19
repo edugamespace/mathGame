@@ -35,7 +35,8 @@
       margin-bottom: 20px;
     }
     #number-image img {
-      height: 100px;
+      height: 150px;
+      border-radius: 20px;     /* 🎯 테두리 둥글게 */
       margin-bottom: 40px;
     }
     #choices {
@@ -44,31 +45,29 @@
       flex-wrap: wrap;
       gap: 20px;
     }
-    .choice-card {
-      width: 120px;
-      height: 120px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
+ .choice-card {
+  width: 140px;
+  height: 140px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
     .choice-card:hover {
       transform: scale(1.05);
-      box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.2);
     }
     .choice-card img {
-      max-width: 100%;
-      max-height: 100%;
-    }
+  width: 100%;          /* 무조건 카드 너비에 맞춤 */
+  height: 100%;         /* 무조건 카드 높이에 맞춤 */
+  object-fit: cover;    /* 넘치는 부분 잘라내되 꽉 채우기 */
+  border-radius: 20px;  /* 이미지 자체도 둥글게 */
+}
   </style>
 </head>
 <body>
   <div id="progress-bar"></div>
-  <div id="question">몇 개일까요?</div>
   <div id="number-image"></div>
   <div id="choices"></div>
   <script src="script.js"></script>
