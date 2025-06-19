@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>과일 수 세기 게임</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    #progress-bar {
+      display: grid;
+      grid-template-columns: repeat(10, 40px);
+      grid-template-rows: repeat(2, 40px);
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 50px;
+    }
+    .progress-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background-color: lightgray;
+    }
+    .progress-box.correct {
+      background-color: #4da6ff;
+    }
+    .progress-box.wrong {
+      background-color: #ff6666;
+    }
+    #question {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    #number-image img {
+      height: 100px;
+      margin-bottom: 40px;
+    }
+    #choices {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .choice-card {
+      width: 120px;
+      height: 120px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .choice-card:hover {
+      transform: scale(1.05);
+      box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.2);
+    }
+    .choice-card img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="progress-bar"></div>
+  <div id="question">몇 개일까요?</div>
+  <div id="number-image"></div>
+  <div id="choices"></div>
+  <script src="script.js"></script>
+</body>
+</html>
