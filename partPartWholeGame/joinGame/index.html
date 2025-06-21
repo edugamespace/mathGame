@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>join game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      background-color: #ffffff;
+      padding: 10px;
+    }
+    #progress-bar {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 6px;
+      max-width: 500px;
+      margin: 0px auto 16px;
+    }
+    .progress-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      background-color: #eee;
+      cursor: pointer;
+    }
+    .progress-box.correct { background-color: #3b82f6; }
+    .progress-box.incorrect { background-color: #ef4444; }
+
+    .problem-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .problem-row {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 10px 0;
+    }
+
+  .placeholder-wrapper {
+  position: relative;
+  width: 320px;
+  height: 160px;
+  margin-bottom: 20px;
+}
+
+.placeholder-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 30px;
+}
+
+.placeholder-number-img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40%;
+  height: auto;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+    .answer-row {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+
+    .answer-img {
+      width: 100px;
+      height: 100px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .answer-img:hover {
+      transform: scale(1.1);
+    }
+
+    #celebration {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.95);
+      z-index: 1000;
+    }
+
+    #final-score-text {
+      font-size: 150px;
+      color: #000;
+      margin-bottom: 20px;
+    }
+
+    #final-score-message {
+      font-size: 36px;
+      margin-bottom: 30px;
+    }
+
+    #celebration button {
+      padding: 12px 24px;
+      font-size: 20px;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      margin: 10px;
+      cursor: pointer;
+    }
+
+    .retry-btn { background-color: #3b82f6; }
+    .exit-btn { background-color: #ef4444; }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<div class="problem-wrapper">
+  <!-- 문제 카드 두 장 -->
+  <div class="problem-row">
+    <img id="num1" src="" width="160" height="160">
+    <img id="num2" src="" width="160" height="160">
+  </div>
+
+  <!-- placeholder는 아래로 -->
+  <div class="placeholder-wrapper">
+    <img id="placeholder" class="placeholder-img" src="">
+    <img id="placeholder-number" class="placeholder-number-img" src="">
+  </div>
+</div>
+
+<div id="game-container" class="answer-row"></div>
+
+<div id="celebration">
+  <div id="final-score-text"></div>
+  <div id="final-score-message"></div>
+  <button class="retry-btn" onclick="location.reload()">다시 할게요</button>
+  <button class="exit-btn" onclick="window.location.href='https://raimtree.tistory.com/entry/%EB%8B%AC%EB%A0%A5%EA%B3%BC-%EC%8B%9C%EA%B3%84'">그만 할래요</button>
+</div>
+
+<audio id="correctSound" src="sounds/correct.mp3" preload="auto"></audio>
+<audio id="wrongSound" src="sounds/wrong.mp3" preload="auto"></audio>
+
+<script src="collect_game_final.js"></script>
+</body>
+</html>
