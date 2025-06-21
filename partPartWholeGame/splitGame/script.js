@@ -56,6 +56,8 @@ function loadProblem(index) {
     placeholderRight.src = `images/placeholders/${color}_blank.png`;
   }
 
+
+
   // 보기 구성
   let choices = [answer - 2, answer - 1, answer, answer + 1, answer + 2]
     .filter(n => n >= 1 && n <= 12);
@@ -79,6 +81,15 @@ function loadProblem(index) {
         wrongSound.play();
         results[index] = false;
       }
+
+// 선택한 숫자 이미지를 빈칸에 보여주기
+const selectedImg = `images/placeholders/${color}${choice}.png`;
+if (isLeftBlank) {
+  placeholderLeft.src = selectedImg;
+} else {
+  placeholderRight.src = selectedImg;
+}
+
       updateProgressBar();
       setTimeout(nextProblem, 700);
     };
