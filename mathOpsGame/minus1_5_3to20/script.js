@@ -3,12 +3,30 @@ const startTime = Date.now();
 const problems = [];
 
 while (problems.length < 20) {
-  const num = Math.floor(Math.random() * 20) + 1; // 1~20
   const type = Math.floor(Math.random() * 5) + 1; // 1~5
-  const answer = num + type;
+  let num, answer, image;
 
-  // 이미지 파일이 실제로 존재하는 범위를 확인하려면, 서버에서 목록 제한 필요
-  const image = `images/problems/plus_${num}_${type}.png`;
+  if (type === 1) {
+    num = 20;
+    answer = 19;
+    image = `images/problems/minus_20_1.png`;
+  } else if (type === 2) {
+    num = Math.floor(Math.random() * (20 - 5 + 1)) + 5; // 5~20
+    answer = num - 2;
+    image = `images/problems/minus_${num}_2.png`;
+  } else if (type === 3) {
+    num = Math.floor(Math.random() * (20 - 6 + 1)) + 6; // 6~20
+    answer = num - 3;
+    image = `images/problems/minus_${num}_3.png`;
+  } else if (type === 4) {
+    num = Math.floor(Math.random() * (20 - 7 + 1)) + 7; // 7~20
+    answer = num - 4;
+    image = `images/problems/minus_${num}_4.png`;
+  } else {
+    num = Math.floor(Math.random() * (20 - 8 + 1)) + 8; // 8~20
+    answer = num - 5;
+    image = `images/problems/minus_${num}_5.png`;
+  }
 
   problems.push({ image, answer });
 }

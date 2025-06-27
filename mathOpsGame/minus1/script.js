@@ -3,12 +3,12 @@ const startTime = Date.now();
 const problems = [];
 
 while (problems.length < 20) {
-  const num = Math.floor(Math.random() * 99) + 1; // 1~99
-  const answer = num + 1;
+  const num = Math.floor(Math.random() * 97) + 4; // 4~100
+  const answer = num - 1;
 
   
   problems.push({
-    image: `images/problems/plus_${num}_1.png`,
+    image: `images/problems/minus_${num}_1.png`,
     answer: answer
   });
 

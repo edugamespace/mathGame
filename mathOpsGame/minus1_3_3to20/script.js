@@ -3,27 +3,26 @@ const startTime = Date.now();
 const problems = [];
 
 while (problems.length < 20) {
-  const num = Math.floor(Math.random() * 20) + 1; // 1~20
   const type = Math.floor(Math.random() * 3) + 1; // 1~3
-
-  let answer, image;
+  let num, answer, image;
 
   if (type === 1) {
-    answer = num + 1;
-    if (answer > 100) continue;
-    image = `images/problems/plus_${num}_1.png`;
+    num = Math.floor(Math.random() * (20 - 4 + 1)) + 4; // 4~20
+    answer = num - 1;
+    image = `images/problems/minus_${num}_1.png`;
   } else if (type === 2) {
-    answer = num + 2;
-    if (answer > 100) continue;
-    image = `images/problems/plus_${num}_2.png`;
+    num = Math.floor(Math.random() * (20 - 5 + 1)) + 5; // 5~20
+    answer = num - 2;
+    image = `images/problems/minus_${num}_2.png`;
   } else {
-    answer = num + 3;
-    if (answer > 100) continue;
-    image = `images/problems/plus_${num}_3.png`;
+    num = Math.floor(Math.random() * (20 - 6 + 1)) + 6; // 6~20
+    answer = num - 3;
+    image = `images/problems/minus_${num}_3.png`;
   }
 
   problems.push({ image, answer });
 }
+
 
 
 const correctSound = new Audio('sounds/correct.mp3');

@@ -3,14 +3,14 @@ const startTime = Date.now();
 const problems = [];
 
 while (problems.length < 20) {
-  const num = Math.floor(Math.random() * 96) + 4; // 1~96
-  const answer = num + 4;
+  const num = Math.floor(Math.random() * 94) + 7; // 7~100
+  const answer = num - 4;
 
 
 
 
   problems.push({
-    image: `images/problems/plus_${num}_4.png`,
+    image: `images/problems/minus_${num}_4.png`,
     answer: answer
   });
 

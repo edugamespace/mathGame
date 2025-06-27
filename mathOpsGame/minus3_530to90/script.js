@@ -3,13 +3,22 @@ const startTime = Date.now();
 const problems = [];
 
 while (problems.length < 20) {
-  const num = Math.floor(Math.random() * 61) + 30; // 30~90
-  const type = Math.floor(Math.random() * 3) + 3;  // +3, +4, +5
+  const type = Math.floor(Math.random() * 3) + 3; // 3, 4, 5
+  let num, answer, image;
 
-  const answer = num + type;
-  if (answer > 100) continue;
-
-  const image = `images/problems/plus_${num}_${type}.png`;
+  if (type === 3) {
+    num = Math.floor(Math.random() * (90 - 33 + 1)) + 33; // 33~90
+    answer = num - 3;
+    image = `images/problems/minus_${num}_3.png`;
+  } else if (type === 4) {
+    num = Math.floor(Math.random() * (90 - 34 + 1)) + 34; // 34~90
+    answer = num - 4;
+    image = `images/problems/minus_${num}_4.png`;
+  } else {
+    num = Math.floor(Math.random() * (90 - 35 + 1)) + 35; // 35~90
+    answer = num - 5;
+    image = `images/problems/minus_${num}_5.png`;
+  }
 
   problems.push({ image, answer });
 }

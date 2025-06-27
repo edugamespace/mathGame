@@ -3,14 +3,14 @@ const startTime = Date.now();
 const problems = [];
 
 while (problems.length < 20) {
-  const num = Math.floor(Math.random() * 95) + 5; // 1~95
-  const answer = num + 5;
+  const num = Math.floor(Math.random() * 93) + 8; // 8~100
+  const answer = num - 5;
 
   if (answer > 100) continue; // 안전하게 한 번 더 걸러줌
 
   
   problems.push({
-    image: `images/problems/plus_${num}_5.png`,
+    image: `images/problems/minus_${num}_5.png`,
     answer: answer
   });
 
