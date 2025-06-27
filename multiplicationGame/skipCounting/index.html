@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skip Counting Game</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; }
+   #mode-buttons button {
+  margin: 5px;
+  padding: 10px 15px;
+  font-size: 20px;
+  background-color: black;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+    #card-grid {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 3px;
+      max-width: 800px;
+      margin: 20px auto;
+    }
+    .card {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      cursor: pointer;
+    }
+    .card img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+  border-radius: 5px;  /* ← 원하는 만큼 둥글게 */
+
+    }
+  </style>
+</head>
+<body>
+  <h1>Skip Counting Game</h1>
+  <div id="mode-buttons"></div>
+  <div id="card-grid"></div>
+  <audio id="wrong-sound" src="sounds/wrong.mp3"></audio>
+
+  <script>
+    const cardGrid = document.getElementById('card-grid');
+    const modeButtons = document.getElementById('mode-buttons');
+    const wrongSound = document.getElementById('wrong-sound');
+
+    const frontImageMap = [
+      { range: [1, 10], src: 'images/front1_10.png' },
+      { range: [11, 20], src: 'images/front11_20.png' },
+      { range: [21, 30], src: 'images/front21_30.png' },
+      { range: [31, 40], src: 'images/front31_40.png' },
+      { range: [41, 50], src: 'images/front41_50.png' },
+      { range: [51, 60], src: 'images/front51_60.png' },
+      { range: [61, 70], src: 'images/front61_70.png' },
+      { range: [71, 80], src: 'images/front71_80.png' },
+      { range: [81, 90], src: 'images/front81_90.png' },
+      { range: [91, 100], src: 'images/front91_100.png' }
+    ];
+
+    let currentMode = 2;
+    let expectedSequence = [];
+    let currentIndex = 0;
+
+    function getFrontImageSrc(number) {
+      return frontImageMap.find(m => number >= m.range[0] && number <= m.range[1]).src;
+    }
+
+    function loadCards() {
+      cardGrid.innerHTML = '';
+      currentIndex = 0;
+      expectedSequence = [];
+
+      for (let i = currentMode; i <= 100; i += currentMode) {
+        expectedSequence.push(i);
+      }
+
+      for (let i = 1; i <= 100; i++) {
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const img = document.createElement('img');
+        img.src = getFrontImageSrc(i);
+        img.dataset.number = i;
+        img.dataset.flipped = 'false';
+
+        card.appendChild(img);
+        card.addEventListener('click', () => handleCardClick(img));
+        cardGrid.appendChild(card);
+      }
+    }
+
+    function handleCardClick(img) {
+      const num = parseInt(img.dataset.number);
+
+      if (img.dataset.flipped === 'true') return;
+
+      if (num === expectedSequence[currentIndex]) {
+        currentIndex++;
+        img.src = `images/back_${num}.png`;
+        img.dataset.flipped = 'true';
+        playNumberSound(num);
+      } else {
+        wrongSound.currentTime = 0;
+        wrongSound.play();
+      }
+    }
+
+    function playNumberSound(num) {
+      const audio = new Audio(`sounds/${num}.mp3`);
+      audio.play();
+    }
+
+    function createModeButtons() {
+      for (let i = 2; i <= 9; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = `By ${i}`;
+        btn.addEventListener('click', () => {
+          currentMode = i;
+          loadCards();
+        });
+        modeButtons.appendChild(btn);
+      }
+    }
+
+    createModeButtons();
+    loadCards();
+  </script>
+</body>
+</html>
