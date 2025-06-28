@@ -2,68 +2,73 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>과일 수 세기 게임</title>
   <style>
-    body {
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;       /* 스크롤 방지 */
+      touch-action: none;     /* 터치로 인한 화면 흔들림 방지 */
       font-family: 'Arial', sans-serif;
       text-align: center;
-      padding: 20px;
+      background-color: #fff;
     }
+
     #progress-bar {
       display: grid;
       grid-template-columns: repeat(10, 40px);
       grid-template-rows: repeat(2, 40px);
       gap: 10px;
       justify-content: center;
-      margin-bottom: 50px;
+      margin: 20px auto;
     }
+
     .progress-box {
       width: 40px;
       height: 40px;
       border-radius: 8px;
       background-color: lightgray;
     }
-    .progress-box.correct {
-      background-color: #4da6ff;
-    }
-    .progress-box.wrong {
-      background-color: #ff6666;
-    }
-    #question {
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
+
+    .progress-box.correct { background-color: #4da6ff; }
+    .progress-box.wrong { background-color: #ff6666; }
+
     #number-image img {
       height: 150px;
-      border-radius: 20px;     /* 🎯 테두리 둥글게 */
-      margin-bottom: 40px;
+      border-radius: 20px;
+      margin-bottom: 30px;
     }
+
     #choices {
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
       gap: 20px;
+      padding: 20px;
     }
- .choice-card {
-  width: 140px;
-  height: 140px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
+
+    .choice-card {
+      width: 140px;
+      height: 140px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
 
     .choice-card:hover {
       transform: scale(1.05);
     }
+
     .choice-card img {
-  width: 100%;          /* 무조건 카드 너비에 맞춤 */
-  height: 100%;         /* 무조건 카드 높이에 맞춤 */
-  object-fit: cover;    /* 넘치는 부분 잘라내되 꽉 채우기 */
-  border-radius: 20px;  /* 이미지 자체도 둥글게 */
-}
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 20px;
+    }
 
     #celebration {
       display: none;
@@ -83,6 +88,7 @@
       color: #000;
       margin-bottom: 20px;
     }
+
     #final-score-message {
       font-size: 36px;
       margin-bottom: 30px;
@@ -98,25 +104,22 @@
       cursor: pointer;
     }
 
-    .retry-btn {
-      background-color: #3b82f6;
-    }
-
-    .exit-btn {
-      background-color: #ef4444;
-    }
+    .retry-btn { background-color: #3b82f6; }
+    .exit-btn { background-color: #ef4444; }
   </style>
 </head>
 <body>
   <div id="progress-bar"></div>
   <div id="number-image"></div>
   <div id="choices"></div>
+
   <div id="celebration">
-  <div id="final-score-text"></div>
-  <div id="final-score-message"></div>
-  <button class="retry-btn" onclick="location.reload()">다시 할게요</button>
-  <button class="exit-btn" onclick="window.location.href='https://raimtree.tistory.com/entry/%EB%8B%AC%EB%A0%A5%EA%B3%BC-%EC%8B%9C%EA%B3%84'">그만 할래요</button>
-</div>
+    <div id="final-score-text"></div>
+    <div id="final-score-message"></div>
+    <button class="retry-btn" onclick="location.reload()">다시 할게요</button>
+    <button class="exit-btn" onclick="window.location.href='https://raimtree.tistory.com/entry/%EB%8B%AC%EB%A0%A5%EA%B3%BC-%EC%8B%9C%EA%B3%84'">그만 할래요</button>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
