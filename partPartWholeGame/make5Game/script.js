@@ -48,7 +48,7 @@ function updateProgressBar() {
 
 function loadProblem(index) {
   const { color } = selectedProblems[index];
-  const shown = Math.floor(Math.random() * 6); // 0~5
+  const shown = Math.floor(Math.random() * 5)+1; // 1~5
   const answer = 5 - shown;
   const isLeftBlank = Math.random() < 0.5;
 
@@ -62,10 +62,8 @@ function loadProblem(index) {
     problemRight.src = `images/problems/${color}_blank.png`;
   }
 
-  let choices = Array.from({ length: 6 }, (_, i) => i).filter(n => n !== answer);
-  choices = shuffle(choices).slice(0, 4);
-  choices.push(answer);
-  choices = shuffle(choices);
+  const choices = [0, 1, 2, 3, 4, 5]; // 항상 정렬된 보기 카드
+
 
   container.innerHTML = '';
   container.style.display = 'flex';

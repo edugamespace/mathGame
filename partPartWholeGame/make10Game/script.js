@@ -15,7 +15,7 @@ const colors = ['purple', 'blue', 'green', 'orange', 'yellow'];
 const all = [];
 
 colors.forEach(color => {
-  for (let n = 0; n <= 5; n++) {
+  for (let n = 0; n <= 10; n++) {
     all.push({ color, number: n });
   }
 });
@@ -48,11 +48,12 @@ function updateProgressBar() {
 
 function loadProblem(index) {
   const { color } = selectedProblems[index];
-  const shown = Math.floor(Math.random() * 6); // 0~5
-  const answer = 5 - shown;
+  const shown = Math.floor(Math.random() * 10)+1; // 1~10
+  const answer = 10 - shown;
   const isLeftBlank = Math.random() < 0.5;
 
-   placeholderImg.src = `images/placeholders/${color}5.png`;
+  // 아래 placeholder는 항상 같은 숫자 10
+  placeholderImg.src = `images/placeholders/${color}10.png`;
 
   if (isLeftBlank) {
     problemLeft.src = `images/problems/${color}_blank.png`;
@@ -62,10 +63,17 @@ function loadProblem(index) {
     problemRight.src = `images/problems/${color}_blank.png`;
   }
 
-  let choices = Array.from({ length: 6 }, (_, i) => i).filter(n => n !== answer);
-  choices = shuffle(choices).slice(0, 4);
-  choices.push(answer);
-  choices = shuffle(choices);
+// choices 설정: 정답과 그 근처 숫자들로 5개만
+let choices = [];
+
+for (let i = answer - 2; i <= answer + 2; i++) {
+  if (i >= 0 && i <= 10) choices.push(i);
+}
+
+choices = [...new Set(choices)]; // 중복 제거
+choices = shuffle(choices).filter(n => n !== answer).slice(0, 4); // 정답을 제외한 4개
+choices.push(answer); // 정답 하나만 추가
+choices = shuffle(choices); // 최종 셔플
 
   container.innerHTML = '';
   container.style.display = 'flex';
@@ -111,7 +119,7 @@ function nextProblem() {
 
     document.getElementById('final-score-text').textContent = `${finalScore}점`;
     document.getElementById('final-score-message').textContent =
-      finalScore >= 55 ? '🎆 참 잘했어요!' : '😊 조금 더 연습해 볼까요?';
+      finalScore >= 70 ? '🎆 참 잘했어요!' : '😊 조금 더 연습해 볼까요?';
 
     const elapsedSec = Math.floor((Date.now() - startTime) / 1000);
     const timeText = document.createElement('div');

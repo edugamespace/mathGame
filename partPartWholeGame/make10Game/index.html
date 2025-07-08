@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>make5Game</title>
+  <title>make10Game</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
@@ -44,6 +44,10 @@
       gap: 20px;
       margin: 10px 0;
     }
+
+.problem-img {
+  border-radius: 30px;
+}
 
     .placeholder-wrapper {
       position: relative;
@@ -131,10 +135,11 @@
 
 <div class="problem-wrapper">
   <!-- 윗줄: 문제 카드 2장 -->
-  <div class="problem-row">
-    <img id="problemLeft" src="" width="160" height="160">
-    <img id="problemRight" src="" width="160" height="160">
-  </div>
+ <div class="problem-row">
+  <img id="problemLeft" class="problem-img" src="" width="160" height="160">
+  <img id="problemRight" class="problem-img" src="" width="160" height="160">
+</div>
+
 
   <!-- 아랫줄: 정답 카드 1장 -->
   <div class="problem-row">
