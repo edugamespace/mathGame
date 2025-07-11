@@ -2,30 +2,44 @@
 let currentIndex = 0;
 let correctCount = 0;
 let startTime = null;
-const totalQuestions = 30;
+const totalQuestions = 20;
 let baseLevel = 0;
 let addLevel = 0;
 
 const baseRanges = [
   [1, 10], [1, 20], [1, 30], [1, 50], [30, 50], [40, 70], [1, 100], [30, 100]
 ];
-const addRanges = [
+const subRanges = [
   [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7], [8, 8], [9, 9], 
   [1, 3], [1, 5], [3, 5], [3, 9], [1, 9]
 ];
 
-const correctSound = new Audio("correct.mp3");
-const wrongSound = new Audio("wrong.mp3");
+// Improved fully shuffled pick
+function shuffledPick(min, max, label) {
+  if (!window._pickPools) window._pickPools = {};
+  const key = `${label}-${min}-${max}`;
 
-function rand(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  if (!window._pickPools[key] || window._pickPools[key].pool.length === 0) {
+    const numbers = [];
+    const repetitions = 3;
+    for (let i = 0; i < repetitions; i++) {
+      for (let n = min; n <= max; n++) {
+        numbers.push(n);
+      }
+    }
+    // Fisher-Yates shuffle
+    for (let i = numbers.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+    }
+    window._pickPools[key] = { pool: numbers };
+  }
+
+  return window._pickPools[key].pool.pop();
 }
 
-function getCurrentRanges() {
-  let base = baseRanges[Math.min(baseLevel, baseRanges.length - 1)];
-  let add = addRanges[Math.min(addLevel, addRanges.length - 1)];
-  return { base, add };
-}
+const correctSound = new Audio('sounds/correct.mp3');
+const wrongSound = new Audio('sounds/wrong.mp3');
 
 function startGame() {
   correctCount = 0;
@@ -36,6 +50,12 @@ function startGame() {
   document.getElementById("choicesBox").style.display = "block";
   generateProgressGrid();
   generateNextQuestion();
+}
+
+function getCurrentRanges() {
+  let base = baseRanges[Math.min(baseLevel, baseRanges.length - 1)];
+  let sub = subRanges[Math.min(addLevel, subRanges.length - 1)];
+  return { base, sub };
 }
 
 function generateProgressGrid() {
@@ -55,17 +75,19 @@ function generateNextQuestion() {
     return;
   }
 
-  const { base, add } = getCurrentRanges();
-  const a = rand(...base);
-  const b = rand(...add);
-  const correct = a + b;
+  const { base, sub } = getCurrentRanges();
+  let a = shuffledPick(...base, 'base');
+  let b = shuffledPick(...sub, 'sub');
 
-  document.getElementById("questionBox").innerHTML = `<h2>${a} + ${b} = ?</h2>`;
+  if (a < b) [a, b] = [b, a]; // no negatives
+  const correct = a - b;
+
+  document.getElementById("questionBox").innerHTML = `<h2>${a} - ${b} = ?</h2>`;
 
   const options = new Set([correct]);
   while (options.size < 5) {
-    const wrong = correct + rand(-10, 10);
-    if (wrong !== correct && wrong > 0) options.add(wrong);
+    let wrong = correct + Math.floor(Math.random() * 21) - 10;
+    if (wrong !== correct && wrong >= 0) options.add(wrong);
   }
 
   const shuffled = [...options].sort(() => Math.random() - 0.5);
@@ -107,10 +129,10 @@ function endGame() {
 
   if (passedTime && passedScore) {
     recDiv.innerHTML = `
-      <p>좋아요! 1분 이내 + 85점 이상 달성했어요 🎉 다음 단계로 넘어가보세요!</p>
+      <p>참 잘했습니다. 다음 단계로 넘어가보세요 🎉</p>
       <button onclick="nextLevel()" style="font-size:1.5rem;">다음 단계로 넘어가기</button><br>
-      <button onclick="stopGame()" class="small-btn">그만할래요</button>
-      <button onclick="startGame()" class="small-btn">이번 단계 한 번 더</button>
+      <button onclick="stopGame()" style="font-size:0.8rem;">그만할래요</button>
+      <button onclick="startGame()" style="font-size:0.8rem;">이번 단계 한 번 더</button>
     `;
     baseLevel++;
     if (baseLevel >= baseRanges.length) {
@@ -119,10 +141,10 @@ function endGame() {
     }
   } else {
     recDiv.innerHTML = `
-      <p>이번에는 1분 초과 또는 점수가 85점 미만이에요.<br>이번 단계를 한 번 더 해보는 걸 추천해요!</p>
-      <button onclick="startGame()" style="font-size:1.6rem; padding: 14px 24px;">이번 단계 한 번 더</button><br>
-      <button onclick="stopGame()" class="small-btn">그만할래요</button>
-      <button onclick="nextLevel()" class="small-btn">그래도 다음 단계로</button>
+      <p>끝났습니다. 이번 단계를 한 번 더 해보는 게 좋겠어요!</p>
+      <button onclick="startGame()" style="font-size:1.5rem;">한번 더 해볼게요</button><br>
+      <button onclick="stopGame()" style="font-size:0.8rem;">그만할래요</button>
+      <button onclick="nextLevel()" style="font-size:0.8rem;">다음 단계로 넘어가기</button>
     `;
   }
 
