@@ -1,0 +1,220 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>덧셈 게임</title>
+  <!-- IBM Plex Sans KR Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&family=Nanum+Gothic&display=swap" rel="stylesheet">
+
+  <style>
+     h1 {
+      font-size: 1.3rem; /* 더 작게 */
+      color: #666;
+        margin-bottom: 20px;  /* 아래 간격 추가 */
+
+    }
+
+    h2 {
+      font-size: 3.5rem; /* 더 크게 */
+      color: #3204fd;
+      margin: 10px 0;
+    }
+
+    body {
+        font-family: 'IBM Plex Sans KR', 'Nanum Gothic', sans-serif;
+      background: #fefefe;
+      color: #333;
+      padding: 30px;
+      text-align: center;
+    }
+
+    #progressGrid {
+      display: grid;
+      grid-template-columns: repeat(10, 35px);
+      gap: 8px;
+      justify-content: center;
+      margin: 20px auto;
+    }
+
+    .progress-btn {
+      width: 35px;
+      height: 35px;
+      background: #ddd;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      transition: transform 0.2s;
+    }
+
+    .progress-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .correct { background-color: #46d1fc !important; }
+    .incorrect { background-color: #ffa2a2 !important; }
+
+    .choice-btn {
+      background-color: #ffe0b2;
+      border: none;
+      border-radius: 10px;
+      margin: 12px;
+      padding: 15px 30px;
+      font-size: 1.3rem;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .choice-btn:hover {
+      background-color: #ffcc80;
+      transform: scale(1.05);
+    }
+
+    .select-btn {
+      background-color: #d1c4e9;
+      border: none;
+      border-radius: 8px;
+      margin: 8px;
+      padding: 12px 20px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .select-btn:hover {
+      background-color: #b39ddb;
+      transform: scale(1.05);
+    }
+
+    .selected {
+      background-color: #9575cd !important;
+      color: white;
+    }
+
+    #startButton, #recommendation button {
+      background-color: #81d4fa;
+      border: none;
+      border-radius: 10px;
+      padding: 15px 25px;
+      font-size: 1.2rem;
+      margin-top: 20px;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    #startButton:hover, #recommendation button:hover {
+      background-color: #4fc3f7;
+      transform: scale(1.05);
+    }
+
+    #questionBox h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    #resultScreen {
+      display: none;
+      margin-top: 30px;
+    }
+
+    .selection-group {
+      margin: 20px 0;
+    }
+
+    #recommendation p {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+    }
+
+    .small-btn {
+      font-size: 0.9rem !important;
+      padding: 8px 14px !important;
+      background-color: #f8bbd0 !important;
+    }
+
+    .small-btn:hover {
+      background-color: #f48fb1 !important;
+    }
+
+    #gameArea {
+      display: none;
+    }
+
+  </style>
+</head>
+<body>
+
+<div id="startScreen">
+  <h1>공부할 단계를 선택하세요. 힘들어도 중간에 끄지 말고, 화이팅!!!</h1>
+  
+  <div class="selection-group">
+    <button class="select-btn" data-type="base" data-index="0">1~10</button>
+    <button class="select-btn" data-type="base" data-index="1">1~20</button>
+    <button class="select-btn" data-type="base" data-index="2">1~30</button>
+    <button class="select-btn" data-type="base" data-index="3">1~50</button>
+    <button class="select-btn" data-type="base" data-index="4">30~50</button>
+    <button class="select-btn" data-type="base" data-index="5">1~100</button>
+    <button class="select-btn" data-type="base" data-index="6">30~100</button>
+  </div>
+
+  <h2>+</h2>
+
+  <div class="selection-group">
+    <button class="select-btn" data-type="add" data-index="0">1</button>
+    <button class="select-btn" data-type="add" data-index="1">2</button>
+    <button class="select-btn" data-type="add" data-index="2">3</button>
+    <button class="select-btn" data-type="add" data-index="3">1~3</button>
+    <button class="select-btn" data-type="add" data-index="4">3~5</button>
+    <button class="select-btn" data-type="add" data-index="5">3~9</button>
+    <button class="select-btn" data-type="add" data-index="6">1~10</button>
+  </div>
+
+  <button id="startButton" onclick="startSelectedGame()" disabled>게임 시작</button>
+</div>
+
+
+  <div id="gameArea">
+    <div id="progressGrid"></div>
+    <div id="questionBox"></div>
+    <div id="choicesBox"></div>
+
+    <div id="resultScreen">
+      <h2 id="score"></h2>
+      <p id="time"></p>
+      <div id="recommendation"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    let selectedBase = null;
+    let selectedAdd = null;
+
+    document.querySelectorAll(".select-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const type = btn.dataset.type;
+        const index = parseInt(btn.dataset.index);
+
+        if (type === "base") {
+          selectedBase = index;
+          document.querySelectorAll('[data-type="base"]').forEach(b => b.classList.remove("selected"));
+        } else {
+          selectedAdd = index;
+          document.querySelectorAll('[data-type="add"]').forEach(b => b.classList.remove("selected"));
+        }
+
+        btn.classList.add("selected");
+        document.getElementById("startButton").disabled = !(selectedBase !== null && selectedAdd !== null);
+      });
+    });
+
+    function startSelectedGame() {
+      baseLevel = selectedBase;
+      addLevel = selectedAdd;
+      document.getElementById("startScreen").style.display = "none";
+      document.getElementById("gameArea").style.display = "block";
+      startGame();
+    }
+  </script>
+</body>
+</html>
