@@ -1,5 +1,6 @@
 let selectedBase = null;
 let selectedAdd = null;
+let carryMode = 'withCarry';
 
 let currentIndex = 0;
 let correctCount = 0;
@@ -35,6 +36,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
       btn.classList.add("selected");
       document.getElementById("startButton").disabled = !(selectedBase !== null && selectedAdd !== null);
+    });
+  });
+
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      carryMode = btn.dataset.mode;
     });
   });
 });
@@ -80,8 +89,12 @@ function generateNextQuestion() {
     add: addRanges[Math.min(addLevel, addRanges.length - 1)]
   };
 
-  const a = rand(...base);
-  const b = rand(...add);
+  let a, b;
+  do {
+    a = rand(...base);
+    b = rand(...add);
+  } while (carryMode === 'noCarry' && ((a % 10) + (b % 10) > 9));
+
   const correct = a + b;
 
   document.getElementById("questionBox").innerHTML = `<h2>${a} + ${b} = ?</h2>`;
@@ -133,26 +146,25 @@ function endGame() {
   recDiv.innerHTML = '';
 
   if (durationSec <= 60 && score >= 85) {
-  recDiv.innerHTML = `
-    <p>🤩다음 단계로 넘어가보세요 🎉</p>
-    <button onclick="startGame()" class="result-btn-primary">한번 더 해볼게요</button><br>
-    <button onclick="stopGame()" class="result-btn-secondary">그만할래요</button>
-    <button onclick="nextLevel()" class="result-btn-secondary">다음 단계로 넘어가기</button>
-  `;
-  baseLevel++;
-  if (baseLevel >= baseRanges.length) {
-    baseLevel = 0;
-    addLevel++;
+    recDiv.innerHTML = `
+      <p>🤩다음 단계로 넘어가보세요 🎉</p>
+      <button onclick="startGame()" class="result-btn-primary">한번 더 해볼게요</button><br>
+      <button onclick="stopGame()" class="result-btn-secondary">그만할래요</button>
+      <button onclick="nextLevel()" class="result-btn-secondary">다음 단계로 넘어가기</button>
+    `;
+    baseLevel++;
+    if (baseLevel >= baseRanges.length) {
+      baseLevel = 0;
+      addLevel++;
+    }
+  } else {
+    recDiv.innerHTML = `
+      <p>🐱이번 단계를 한 번 더 해보는 게 좋겠어요!</p>
+      <button onclick="startGame()" class="result-btn-primary">한번 더 해볼게요</button><br>
+      <button onclick="stopGame()" class="result-btn-secondary">그만할래요</button>
+      <button onclick="nextLevel()" class="result-btn-secondary">다음 단계로 넘어가기</button>
+    `;
   }
-} else {
-  recDiv.innerHTML = `
-    <p>🐱이번 단계를 한 번 더 해보는 게 좋겠어요!</p>
-    <button onclick="startGame()" class="result-btn-primary">한번 더 해볼게요</button><br>
-    <button onclick="stopGame()" class="result-btn-secondary">그만할래요</button>
-    <button onclick="nextLevel()" class="result-btn-secondary">다음 단계로 넘어가기</button>
-  `;
-}
-
 
   document.getElementById("resultScreen").style.display = 'block';
   document.getElementById("questionBox").style.display = 'none';
