@@ -126,33 +126,32 @@ function endGame() {
   const durationSec = Math.floor((endTime - startTime) / 1000);
   const score = Math.round((correctCount / totalQuestions) * 100);
 
-  document.getElementById("score").textContent = `${score}점`;
-  document.getElementById("time").textContent = `${durationSec}초`;
+  document.getElementById("score").textContent = `점수: ${score}점`;
+  document.getElementById("time").textContent = `소요 시간: ${durationSec}초`;
 
   const recDiv = document.getElementById("recommendation");
   recDiv.innerHTML = '';
 
   if (durationSec <= 60 && score >= 85) {
-  recDiv.innerHTML = `
-    <p>🤩다음 단계로 넘어가보세요 🎉</p>
-    <button onclick="startGame()" class="result-btn-primary">한번 더 해볼게요</button><br>
-    <button onclick="stopGame()" class="result-btn-secondary">그만할래요</button>
-    <button onclick="nextLevel()" class="result-btn-secondary">다음 단계로 넘어가기</button>
-  `;
-  baseLevel++;
-  if (baseLevel >= baseRanges.length) {
-    baseLevel = 0;
-    addLevel++;
+    recDiv.innerHTML = `
+      <p>🤩다음 단계로 넘어가보세요 🎉</p>
+      <button onclick="nextLevel()" style="font-size:1.5rem;">다음 단계로 넘어가기</button><br>
+      <button onclick="stopGame()" style="font-size:0.8rem;">그만할래요</button>
+      <button onclick="startGame()" style="font-size:0.8rem;">이번 단계 한 번 더</button>
+    `;
+    baseLevel++;
+    if (baseLevel >= baseRanges.length) {
+      baseLevel = 0;
+      addLevel++;
+    }
+  } else {
+    recDiv.innerHTML = `
+      <p>🙃이번 단계를 한 번 더 해보는 게 좋겠어요!</p>
+      <button onclick="startGame()" style="font-size:1.5rem;">한번 더 해볼게요</button><br>
+      <button onclick="stopGame()" style="font-size:0.8rem;">그만할래요</button>
+      <button onclick="nextLevel()" style="font-size:0.8rem;">다음 단계로 넘어가기</button>
+    `;
   }
-} else {
-  recDiv.innerHTML = `
-    <p>🐱이번 단계를 한 번 더 해보는 게 좋겠어요!</p>
-    <button onclick="startGame()" class="result-btn-primary">한번 더 해볼게요</button><br>
-    <button onclick="stopGame()" class="result-btn-secondary">그만할래요</button>
-    <button onclick="nextLevel()" class="result-btn-secondary">다음 단계로 넘어가기</button>
-  `;
-}
-
 
   document.getElementById("resultScreen").style.display = 'block';
   document.getElementById("questionBox").style.display = 'none';
