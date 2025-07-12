@@ -9,7 +9,7 @@ const baseRanges = [
   [30, 100],
 ];
 
-const addRanges = [
+const subRanges = [
   [1, 1],
   [2, 2],
   [3, 3],
@@ -27,7 +27,8 @@ const addRanges = [
 ];
 
 let baseLevel = 0;
-let addLevel = 0;
+let subLevel = 0;
+let borrowMode = "withBorrow"; // 기본값
 let problems = [];
 let currentIndex = 0;
 let correctCount = 0;
@@ -49,10 +50,20 @@ function getRandomFrom([min, max]) {
 
 function generateQuestion(baseRange, subRange) {
   let base, sub;
-  do {
+  while (true) {
     base = getRandomFrom(baseRange);
     sub = getRandomFrom(subRange);
-  } while (sub > base); // 음수 방지
+
+    if (sub > base) continue; // 음수 방지
+
+    if (borrowMode === "noBorrow") {
+      const unitBase = base % 10;
+      const unitSub = sub % 10;
+      if (unitBase < unitSub) continue; // 받아내림 없음 조건 위반
+    }
+
+    break;
+  }
 
   return {
     question: `${base} - ${sub}`,
@@ -63,7 +74,7 @@ function generateQuestion(baseRange, subRange) {
 function generateProblems() {
   problems = [];
   for (let i = 0; i < 20; i++) {
-    problems.push(generateQuestion(baseRanges[baseLevel], addRanges[addLevel]));
+    problems.push(generateQuestion(baseRanges[baseLevel], subRanges[subLevel]));
   }
 }
 
@@ -121,7 +132,7 @@ function startGame() {
 }
 
 function startSelectedGame() {
-  if (baseLevel !== null && addLevel !== null) startGame();
+  if (baseLevel !== null && subLevel !== null) startGame();
 }
 
 function setupProgressGrid() {
@@ -136,37 +147,34 @@ function setupProgressGrid() {
 function endGame() {
   const endTime = new Date();
   const durationSec = Math.round((endTime - startTime) / 1000);
+  const score = Math.round((correctCount / 20) * 100);
 
-  scoreEl.textContent = `${Math.round((correctCount / 20) * 100)}점`;
+  scoreEl.textContent = `${score}점`;
   timeEl.textContent = `걸린 시간: ${durationSec}초`;
 
-  let score = Math.round((correctCount / 20) * 100);
-// 게임 영역 숨김 + 결과 화면 표시
   gameArea.style.display = "none";
   resultScreen.style.display = "block";
+
   if (durationSec <= 60 && score >= 85) {
-   recDiv.innerHTML = `
-    <p>🤩다음 단계로 넘어가보세요 🎉</p>
-    <button onclick="startGame()" class="result-btn-primary">한번 더 해볼게요</button><br>
-    <button onclick="stopGame()" class="result-btn-secondary">그만할래요</button>
-    <button onclick="nextLevel()" class="result-btn-secondary">다음 단계로 넘어가기</button>
-  `;
-  baseLevel++;
-  if (baseLevel >= baseRanges.length) {
-    baseLevel = 0;
-    addLevel++;
+    recDiv.innerHTML = `
+      <p>🤩다음 단계로 넘어가보세요 🎉</p>
+      <button onclick="startGame()" class="result-btn-primary">한번 더 해볼게요</button><br>
+      <button onclick="stopGame()" class="result-btn-secondary">그만할래요</button>
+      <button onclick="nextLevel()" class="result-btn-secondary">다음 단계로 넘어가기</button>
+    `;
+    baseLevel++;
+    if (baseLevel >= baseRanges.length) {
+      baseLevel = 0;
+      subLevel++;
+    }
+  } else {
+    recDiv.innerHTML = `
+      <p>🐱이번 단계를 한 번 더 해보는 게 좋겠어요!</p>
+      <button onclick="startGame()" class="result-btn-primary">한번 더 해볼게요</button><br>
+      <button onclick="stopGame()" class="result-btn-secondary">그만할래요</button>
+      <button onclick="nextLevel()" class="result-btn-secondary">다음 단계로 넘어가기</button>
+    `;
   }
-} else {
-  recDiv.innerHTML = `
-    <p>🐱이번 단계를 한 번 더 해보는 게 좋겠어요!</p>
-    <button onclick="startGame()" class="result-btn-primary">한번 더 해볼게요</button><br>
-    <button onclick="stopGame()" class="result-btn-secondary">그만할래요</button>
-    <button onclick="nextLevel()" class="result-btn-secondary">다음 단계로 넘어가기</button>
-  `;
-}
-
-
-  resultScreen.style.display = "block";
 }
 
 function nextLevel() {
@@ -179,6 +187,7 @@ function stopGame() {
   resultScreen.style.display = "none";
 }
 
+// 선택 버튼 이벤트
 document.querySelectorAll('.select-btn[data-type="base"]').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.select-btn[data-type="base"]').forEach(b => b.classList.remove('selected'));
@@ -188,17 +197,26 @@ document.querySelectorAll('.select-btn[data-type="base"]').forEach(btn => {
   });
 });
 
-document.querySelectorAll('.select-btn[data-type="add"]').forEach(btn => {
+document.querySelectorAll('.select-btn[data-type="sub"]').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.select-btn[data-type="add"]').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('.select-btn[data-type="sub"]').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
-    addLevel = parseInt(btn.dataset.index);
+    subLevel = parseInt(btn.dataset.index);
     checkStartReady();
+  });
+});
+
+// 받아내림 모드 버튼 이벤트
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    borrowMode = btn.dataset.mode;
   });
 });
 
 function checkStartReady() {
   const baseSelected = document.querySelector('.select-btn[data-type="base"].selected');
-  const addSelected = document.querySelector('.select-btn[data-type="add"].selected');
-  document.getElementById('startButton').disabled = !(baseSelected && addSelected);
+  const subSelected = document.querySelector('.select-btn[data-type="sub"].selected');
+  document.getElementById('startButton').disabled = !(baseSelected && subSelected);
 }
