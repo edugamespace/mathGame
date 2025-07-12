@@ -155,12 +155,12 @@ function endGame() {
   gameArea.style.display = "none";
   resultScreen.style.display = "block";
 
-  if (durationSec <= 60 && score >= 85) {
+  if (score >= 90) {
     recDiv.innerHTML = `
       <p>🤩다음 단계로 넘어가보세요 🎉</p>
-      <button onclick="startGame()" class="result-btn-primary">한번 더 해볼게요</button><br>
+      <button onclick="startGame()" class="result-btn-primary">다음 단계로 넘어가기</button><br>
       <button onclick="stopGame()" class="result-btn-secondary">그만할래요</button>
-      <button onclick="nextLevel()" class="result-btn-secondary">다음 단계로 넘어가기</button>
+      <button onclick="nextLevel()" class="result-btn-secondary">이번 단계 한 번 더</button>
     `;
     baseLevel++;
     if (baseLevel >= baseRanges.length) {
