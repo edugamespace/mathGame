@@ -72,6 +72,8 @@ function startGame() {
   document.getElementById("resultScreen").style.display = "none";
   document.getElementById("questionBox").style.display = "block";
   document.getElementById("choicesBox").style.display = "block";
+    progressGrid.style.display = "grid"; // ✅ 이 줄 추가
+
   generateProgressGrid();
   generateNextQuestion();
 }
@@ -165,9 +167,9 @@ function endGame() {
   if (score >= 90) {
     recDiv.innerHTML = `
       <p>🤩다음 단계로 넘어가보세요!</p>
-      <button onclick="startGame()" class="result-btn-primary">다음 단계로 넘어가기</button><br>
+      <button onclick="nextLevel()" class="result-btn-primary">다음 단계로 넘어가기</button><br>
       <button onclick="stopGame()" class="result-btn-secondary">그만할래요</button>
-      <button onclick="nextLevel()" class="result-btn-secondary">이번 단계 한 번 더</button>
+      <button onclick="startGame()" class="result-btn-secondary">이번 단계 한 번 더</button>
     `;
     baseLevel++;
     if (baseLevel >= baseRanges.length) {
@@ -189,8 +191,19 @@ function endGame() {
 }
 
 function nextLevel() {
+  baseLevel++;
+  if (baseLevel >= baseRanges.length) {
+    baseLevel = 0;
+    addLevel++;
+    if (addLevel >= addRanges.length) {
+      addLevel = 0;
+    }
+  }
+  selectedBase = baseLevel;
+  selectedAdd = addLevel;
   startGame();
 }
+
 
 function stopGame() {
   alert("수고하셨어요! 게임을 종료합니다.");
