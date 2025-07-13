@@ -1,3 +1,6 @@
+// ================================
+// 전역 변수 및 설정
+// ================================
 let selectedBase = null;
 let selectedAdd = null;
 let carryMode = 'withCarry';
@@ -20,6 +23,9 @@ const addRanges = [
 const correctSound = new Audio('sounds/correct.mp3');
 const wrongSound = new Audio('sounds/wrong.mp3');
 
+// ================================
+// 초기 이벤트 리스너 설정
+// ================================
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".select-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -48,6 +54,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+// ================================
+// 게임 시작 및 초기화
+// ================================
 function startSelectedGame() {
   baseLevel = selectedBase;
   addLevel = selectedAdd;
@@ -67,6 +76,9 @@ function startGame() {
   generateNextQuestion();
 }
 
+// ================================
+// 문제 생성 및 표시
+// ================================
 function generateProgressGrid() {
   const grid = document.getElementById("progressGrid");
   grid.innerHTML = '';
@@ -96,7 +108,6 @@ function generateNextQuestion() {
   } while (carryMode === 'noCarry' && ((a % 10) + (b % 10) > 9));
 
   const correct = a + b;
-
   document.getElementById("questionBox").innerHTML = `<h2>${a} + ${b} = ?</h2>`;
 
   const options = new Set([correct]);
@@ -134,6 +145,9 @@ function generateNextQuestion() {
   });
 }
 
+// ================================
+// 게임 종료 및 결과 처리
+// ================================
 function endGame() {
   const endTime = Date.now();
   const durationSec = Math.floor((endTime - startTime) / 1000);
@@ -141,6 +155,9 @@ function endGame() {
 
   document.getElementById("score").textContent = `${score}점`;
   document.getElementById("time").textContent = `${durationSec}초`;
+
+    document.getElementById("progressGrid").style.display = "none";
+
 
   const recDiv = document.getElementById("recommendation");
   recDiv.innerHTML = '';
@@ -180,6 +197,9 @@ function stopGame() {
   location.reload();
 }
 
+// ================================
+// 유틸 함수
+// ================================
 function rand(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }

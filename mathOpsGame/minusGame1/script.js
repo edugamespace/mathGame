@@ -1,31 +1,6 @@
-const baseRanges = [
-  [1, 10],
-  [1, 20],
-  [1, 30],
-  [1, 50],
-  [30, 50],
-  [40, 70],
-  [1, 100],
-  [30, 100],
-];
-
-const subRanges = [
-  [1, 1],
-  [2, 2],
-  [3, 3],
-  [4, 4],
-  [5, 5],
-  [6, 6],
-  [7, 7],
-  [8, 8],
-  [9, 9],
-  [1, 3],
-  [1, 5],
-  [3, 5],
-  [3, 9],
-  [1, 9],
-];
-
+// =========================
+// 🔧 전역 변수 및 설정
+// =========================
 let baseLevel = 0;
 let subLevel = 0;
 let borrowMode = "withBorrow"; // 기본값
@@ -34,6 +9,21 @@ let currentIndex = 0;
 let correctCount = 0;
 let startTime;
 
+const baseRanges = [
+  [1, 10], [1, 20], [1, 30], [1, 50], [30, 50], [40, 70], [1, 100], [30, 100],
+];
+
+const subRanges = [
+  [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7], [8, 8], [9, 9],
+  [1, 3], [1, 5], [3, 5], [3, 9], [1, 9],
+];
+
+const correctSound = new Audio('sounds/correct.mp3');
+const wrongSound = new Audio('sounds/wrong.mp3');
+
+// =========================
+// 📦 DOM 요소 가져오기
+// =========================
 const startScreen = document.getElementById("startScreen");
 const gameArea = document.getElementById("gameArea");
 const progressGrid = document.getElementById("progressGrid");
@@ -44,6 +34,9 @@ const scoreEl = document.getElementById("score");
 const timeEl = document.getElementById("time");
 const recDiv = document.getElementById("recommendation");
 
+// =========================
+// 🧠 게임 로직
+// =========================
 function getRandomFrom([min, max]) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -78,6 +71,15 @@ function generateProblems() {
   }
 }
 
+function generateChoices(answer) {
+  const choices = new Set([answer]);
+  while (choices.size < 5) {
+    let fake = answer + Math.floor(Math.random() * 11 - 5); // ±5
+    if (fake >= 0 && !choices.has(fake)) choices.add(fake);
+  }
+  return Array.from(choices).sort(() => Math.random() - 0.5);
+}
+
 function showQuestion() {
   const { question, answer } = problems[currentIndex];
   questionBox.innerHTML = `<h2>${question}</h2>`;
@@ -93,21 +95,17 @@ function showQuestion() {
   });
 }
 
-function generateChoices(answer) {
-  const choices = new Set([answer]);
-  while (choices.size < 5) {
-    let fake = answer + Math.floor(Math.random() * 11 - 5); // ±5
-    if (fake >= 0 && !choices.has(fake)) choices.add(fake);
-  }
-  return Array.from(choices).sort(() => Math.random() - 0.5);
-}
-
 function checkAnswer(choice) {
   const isCorrect = choice === problems[currentIndex].answer;
   const btn = document.querySelectorAll(".progress-btn")[currentIndex];
   btn.classList.add(isCorrect ? "correct" : "incorrect");
 
-  if (isCorrect) correctCount++;
+  if (isCorrect) {
+    correctCount++;
+    correctSound.play();
+  } else {
+    wrongSound.play();
+  }
 
   currentIndex++;
   if (currentIndex < 20) {
@@ -129,10 +127,6 @@ function startGame() {
 
   setupProgressGrid();
   showQuestion();
-}
-
-function startSelectedGame() {
-  if (baseLevel !== null && subLevel !== null) startGame();
 }
 
 function setupProgressGrid() {
@@ -177,6 +171,10 @@ function endGame() {
   }
 }
 
+function startSelectedGame() {
+  if (baseLevel !== null && subLevel !== null) startGame();
+}
+
 function nextLevel() {
   startGame();
 }
@@ -187,7 +185,9 @@ function stopGame() {
   resultScreen.style.display = "none";
 }
 
-// 선택 버튼 이벤트
+// =========================
+// 🎯 버튼 이벤트 핸들러
+// =========================
 document.querySelectorAll('.select-btn[data-type="base"]').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.select-btn[data-type="base"]').forEach(b => b.classList.remove('selected'));
@@ -206,7 +206,6 @@ document.querySelectorAll('.select-btn[data-type="sub"]').forEach(btn => {
   });
 });
 
-// 받아내림 모드 버튼 이벤트
 document.querySelectorAll('.mode-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));

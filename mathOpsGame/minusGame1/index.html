@@ -118,21 +118,7 @@
 }
 
 
-    .start-btn {
-      background-color: #020b61;
-      border: none;
-      border-radius: 10px;
-      padding: 15px 25px;
-      font-size: 1.5rem;
-      color: white;
-      margin-top: 20px;
-      transition: background 0.3s, transform 0.2s;
-    }
-
-    .start-btn:hover {
-      background-color: #0015f9df;
-      transform: scale(1.05);
-    }
+   
 
     .mode-btn {
   background-color: #eeeeee;
@@ -151,11 +137,26 @@
   color: white;
 }
 
+ .start-btn {
+      background-color: #020b61;
+      border: none;
+      border-radius: 10px;
+      padding: 15px 25px;
+      font-size: 1.5rem;
+      color: white;
+      margin-top: 20px;
+      transition: background 0.3s, transform 0.2s;
+    }
 
+    .start-btn:hover {
+      background-color: #0015f9df;
+      transform: scale(1.05);
+    }
     #questionBox h2 {
-      font-size: 10rem;
+      font-size: 6rem;
       color: #444;
-      margin-bottom: 0px;
+      font-weight: bold;
+      margin-bottom: 40px;
     }
 
     #resultScreen {
@@ -188,7 +189,7 @@
 .result-btn-primary {
   background-color: #0d09ff;
   color: white;
-  font-size: 2rem;
+  font-size: 1.6rem;
   padding: 20px 36px;
   border-radius: 14px;
   margin: 12px;
@@ -203,7 +204,7 @@
 .result-btn-secondary {
   background-color: #afafaf;
   color: #000000;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   padding: 14px 28px;
   border-radius: 10px;
   margin: 8px;
@@ -258,7 +259,7 @@
     </div>
   </div>
 
-<div class="selection-group">
+<div class="selection-group mode-select">
   <button class="mode-btn selected" data-mode="withBorrow">받아내림 있음</button>
   <button class="mode-btn" data-mode="noBorrow">받아내림 없음</button>
 </div>
