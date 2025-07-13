@@ -10,14 +10,13 @@ let correctCount = 0;
 let startTime;
 
 const baseRanges = [
-  [1, 10], [1, 29], [10, 59], [40, 79], [10, 99],
+  [10, 19], [20, 29], [30, 49], [50, 69], [70, 99], [10, 49], [50, 99]
 ];
-
 
 const subRanges = [
-  [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7], [8, 8], [9, 9],
-  [1, 3], [1, 5], [3, 9],
+  [1, 9], [10, 19], [20, 29], [30, 39], [10, 39]
 ];
+
 
 const correctSound = new Audio('sounds/correct.mp3');
 const wrongSound = new Audio('sounds/wrong.mp3');
@@ -172,6 +171,25 @@ function endGame() {
   }
 }
 
+function updateSubButtons() {
+  const baseMax = baseRanges[baseLevel][1];
+
+  document.querySelectorAll('.select-btn[data-type="sub"]').forEach(btn => {
+    const index = parseInt(btn.dataset.index);
+    const subMax = subRanges[index][1];
+
+    if (subMax > baseMax) {
+      btn.disabled = true;
+      btn.classList.add('disabled-btn');
+      btn.classList.remove('selected');
+    } else {
+      btn.disabled = false;
+      btn.classList.remove('disabled-btn');
+    }
+  });
+}
+
+
 function startSelectedGame() {
   if (baseLevel !== null && subLevel !== null) startGame();
 }
@@ -207,6 +225,8 @@ document.querySelectorAll('.select-btn[data-type="base"]').forEach(btn => {
     btn.classList.add('selected');
     baseLevel = parseInt(btn.dataset.index);
     checkStartReady();
+        updateSubButtons(); // ✅ 여기 추가
+
   });
 });
 
