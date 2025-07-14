@@ -1,96 +1,36 @@
 // ================================
 // 전역 변수 및 설정
 // ================================
-let selectedBase = null;
-let selectedMul = null;
-let carryMode = 'withCarry';
-
 let currentIndex = 0;
 let correctCount = 0;
 let startTime = null;
 const totalQuestions = 20;
-let baseLevel = 0;
-let mulLevel = 0;
-
-const baseRanges = [
-  [1, 9], [10, 19], [10, 29], [10, 49], [30, 69], [10, 99],
-];
-const mulRanges = [
-  [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7], [8, 8], [9, 9],
-  [2, 5], [6, 9], [2, 9],
-];
 
 const correctSound = new Audio('sounds/correct.mp3');
 const wrongSound = new Audio('sounds/wrong.mp3');
 
 // ================================
-// 초기 이벤트 리스너 설정
+// 게임 시작
 // ================================
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".select-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const type = btn.dataset.type;
-      const index = parseInt(btn.dataset.index);
-
-      if (type === "mul") {
-        const mulMax = mulRanges[index][1];
-        const noCarryBtn = document.querySelector(".mode-btn[data-mode='noCarry']");
-        if (mulMax >= 6) {
-          noCarryBtn.classList.add('disabled-btn');
-          carryMode = 'withCarry';
-          document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
-          document.querySelector(".mode-btn[data-mode='withCarry']").classList.add('selected');
-        } else {
-          noCarryBtn.classList.remove('disabled-btn');
-        }
-      }
-
-      if (type === "base") {
-        selectedBase = index;
-        document.querySelectorAll('[data-type="base"]').forEach(b => b.classList.remove("selected"));
-      } else {
-        selectedMul = index;
-        document.querySelectorAll('[data-type="mul"]').forEach(b => b.classList.remove("selected"));
-      }
-
-      btn.classList.add("selected");
-      document.getElementById("startButton").disabled = !(selectedBase !== null && selectedMul !== null);
-    });
-  });
-
-  document.querySelectorAll('.mode-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (btn.classList.contains('disabled-btn')) return;
-      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      carryMode = btn.dataset.mode;
-    });
-  });
-});
-
-// ================================
-// 게임 시작 및 초기화
-// ================================
-function startSelectedGame() {
-  baseLevel = selectedBase;
-  mulLevel = selectedMul;
-  document.getElementById("startScreen").style.display = "none";
-  document.getElementById("gameArea").style.display = "block";
-  startGame();
-}
-
 function startGame() {
   correctCount = 0;
   currentIndex = 0;
   startTime = Date.now();
+
+  document.getElementById("startScreen").style.display = "none";
+  document.getElementById("gameArea").style.display = "block";
   document.getElementById("resultScreen").style.display = "none";
+
+  // ✅ 이 두 줄 추가
   document.getElementById("questionBox").style.display = "block";
   document.getElementById("choicesBox").style.display = "block";
-  progressGrid.style.display = "grid";
+
+  document.getElementById("progressGrid").style.display = "grid";
 
   generateProgressGrid();
   generateNextQuestion();
 }
+
 
 // ================================
 // 문제 생성 및 표시
@@ -98,6 +38,7 @@ function startGame() {
 function generateProgressGrid() {
   const grid = document.getElementById("progressGrid");
   grid.innerHTML = '';
+  grid.style.display = 'grid';
   for (let i = 0; i < totalQuestions; i++) {
     const btn = document.createElement("div");
     btn.className = "progress-btn";
@@ -112,27 +53,16 @@ function generateNextQuestion() {
     return;
   }
 
-  const { base, mul } = {
-    base: baseRanges[Math.min(baseLevel, baseRanges.length - 1)],
-    mul: mulRanges[Math.min(mulLevel, mulRanges.length - 1)]
-  };
-
-  let a, b, attempts = 0;
-  do {
-    a = rand(...base);
-    b = rand(...mul);
-    attempts++;
-    if (attempts > 100) break;
-  } while (carryMode === 'noCarry' && ((a % 10) * (b % 10) >= 10));
-
+  const a = rand(1, 9);
+  const b = rand(1, 9);
   const correct = a * b;
+
   document.getElementById("questionBox").innerHTML = `<h2>${a} × ${b} = ?</h2>`;
 
   const options = new Set([correct]);
   while (options.size < 5) {
-    const wrong = correct + rand(-Math.floor(correct * 0.3), Math.floor(correct * 0.3));
-    const rounded = Math.round(wrong);
-    if (rounded !== correct && rounded > 0) options.add(rounded);
+    const wrong = correct + rand(-5, 5);
+    if (wrong > 0 && wrong !== correct) options.add(wrong);
   }
 
   const shuffled = [...options].sort(() => Math.random() - 0.5);
@@ -149,9 +79,9 @@ function generateNextQuestion() {
     btn.style.backgroundColor = choiceColor;
 
     btn.onclick = () => {
-      const correctAnswer = (choice === correct);
-      document.getElementById(`progress-${currentIndex}`).classList.add(correctAnswer ? 'correct' : 'incorrect');
-      if (correctAnswer) {
+      const isCorrect = (choice === correct);
+      document.getElementById(`progress-${currentIndex}`).classList.add(isCorrect ? 'correct' : 'incorrect');
+      if (isCorrect) {
         correctCount++;
         correctSound.play();
       } else {
@@ -165,7 +95,7 @@ function generateNextQuestion() {
 }
 
 // ================================
-// 게임 종료 및 결과 처리
+// 게임 종료
 // ================================
 function endGame() {
   const endTime = Date.now();
@@ -174,49 +104,17 @@ function endGame() {
 
   document.getElementById("score").textContent = `${score}점`;
   document.getElementById("time").textContent = `${durationSec}초`;
+
   document.getElementById("progressGrid").style.display = "none";
+  document.getElementById("questionBox").style.display = "none";
+  document.getElementById("choicesBox").style.display = "none";
+  document.getElementById("resultScreen").style.display = "block";
 
   const recDiv = document.getElementById("recommendation");
-  recDiv.innerHTML = '';
-
-  if (score >= 90) {
-    recDiv.innerHTML = `
-      <p>🤩다음 단계로 넘어가보세요!</p>
-      <button onclick="nextLevel()" class="result-btn-primary">다음 단계로 넘어가기</button><br>
-      <button onclick="stopGame()" class="result-btn-secondary">그만할래요</button>
-      <button onclick="startGame()" class="result-btn-secondary">이번 단계 한 번 더</button>
-    `;
-    baseLevel++;
-    if (baseLevel >= baseRanges.length) {
-      baseLevel = 0;
-      mulLevel++;
-    }
-  } else {
-    recDiv.innerHTML = `
-      <p>🐱이번 단계를 한 번 더 해보는 게 좋겠어요!</p>
-      <button onclick="startGame()" class="result-btn-primary">한번 더 해볼게요</button><br>
-      <button onclick="stopGame()" class="result-btn-secondary">그만할래요</button>
-      <button onclick="nextLevel()" class="result-btn-secondary">다음 단계로 넘어가기</button>
-    `;
-  }
-
-  document.getElementById("resultScreen").style.display = 'block';
-  document.getElementById("questionBox").style.display = 'none';
-  document.getElementById("choicesBox").style.display = 'none';
-}
-
-function nextLevel() {
-  baseLevel++;
-  if (baseLevel >= baseRanges.length) {
-    baseLevel = 0;
-    mulLevel++;
-    if (mulLevel >= mulRanges.length) {
-      mulLevel = 0;
-    }
-  }
-  selectedBase = baseLevel;
-  selectedMul = mulLevel;
-  startGame();
+  recDiv.innerHTML = `
+    <button onclick="startGame()" class="result-btn-primary">다시할게요</button><br>
+    <button onclick="stopGame()" class="result-btn-secondary">그만할래요</button>
+  `;
 }
 
 function stopGame() {
