@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>minusGame2</title>
+  <title>세자릿수-두자릿수</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&family=Nanum+Gothic&display=swap" rel="stylesheet">
   <style>
-    /* 스타일은 기존 사용하던 그대로 */
-    body {
+
+
+body {
       font-family: 'IBM Plex Sans KR', 'Nanum Gothic', sans-serif;
       background: #fefefe;
       color: #333;
@@ -231,54 +232,45 @@
 
 <div id="startScreen">
   <h1>🐰 공부할 단계를 선택하세요.</h1>
-
-
+  
   <div class="selection-group">
-    <button class="select-btn" data-type="base" data-index="0">10~19</button>
-    <button class="select-btn" data-type="base" data-index="1">20~29</button>
-    <button class="select-btn" data-type="base" data-index="2">30~49</button>
-    <button class="select-btn" data-type="base" data-index="3">50~69</button>
-    <button class="select-btn" data-type="base" data-index="4">70~99</button>
-    <button class="select-btn" data-type="base" data-index="5">10~49</button>
-    <button class="select-btn" data-type="base" data-index="6">50~99</button>
-
-  </div>
-
-  <h2>-</h2>
-
-  <div class="selection-group">
-    <div class="sub-row">
-      <button class="select-btn" data-type="sub" data-index="0">1~9</button>
-      <button class="select-btn" data-type="sub" data-index="1">10~19</button>
-      <button class="select-btn" data-type="sub" data-index="2">20~29</button>
-      <button class="select-btn" data-type="sub" data-index="3">30~39</button>
-      <button class="select-btn" data-type="sub" data-index="4">10~39</button>
-
+      <button class="select-btn" data-type="base" data-index="0">100~199</button>
+      <button class="select-btn" data-type="base" data-index="1">200~299</button>
+      <button class="select-btn" data-type="base" data-index="2">100~599</button>
+      <button class="select-btn" data-type="base" data-index="3">400~799</button>
+      <button class="select-btn" data-type="base" data-index="4">100~999</button>
     </div>
-  </div>
+
+      <h2>-</h2>
+
+    <div class="selection-group sub-row">
+      <button class="select-btn" data-type="sub" data-index="0">10~19</button>
+      <button class="select-btn" data-type="sub" data-index="1">20~29</button>
+      <button class="select-btn" data-type="sub" data-index="2">10~59</button>
+      <button class="select-btn" data-type="sub" data-index="3">40~79</button>
+      <button class="select-btn" data-type="sub" data-index="4">10~99</button>
+    </div>
 
 <div class="selection-group mode-select">
-  <button class="mode-btn selected" data-mode="withBorrow">받아내림 있음</button>
-  <button class="mode-btn" data-mode="noBorrow">받아내림 없음</button>
-</div>
+      <button class="mode-btn" data-mode="borrow2">받아내림 2번 포함</button>
+      <button class="mode-btn" data-mode="borrow1">받아내림 1번 포함</button>
+      <button class="mode-btn" data-mode="noBorrow">받아내림 없음</button>
+    </div>
+    <button id="startButton" class="start-btn" onclick="startSelectedGame()" disabled>게임 시작</button>
+  </div>
 
-  <button id="startButton" class="start-btn" onclick="startSelectedGame()" disabled>게임 시작</button>
-</div>
+<div id="gameArea" style="display:none">
+    <div id="progressGrid"></div>
+    <div id="questionBox"></div>
+    <div id="choicesBox"></div>
+  </div>
 
-<div id="gameArea">
-  <div id="progressGrid"></div>
-  <div id="questionBox"></div>
-  <div id="choicesBox"></div>
-</div>
+  <div id="resultScreen" style="display:none">
+    <h2 id="score"></h2>
+    <p id="time"></p>
+    <div id="recommendation"></div>
+  </div>
 
-<!-- 게임 영역 밖으로 resultScreen 이동 -->
-<div id="resultScreen" style="display: none;">
-  <h2 id="score"></h2>
-  <p id="time"></p>
-  <div id="recommendation"></div>
-</div>
-
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
