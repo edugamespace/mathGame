@@ -2,18 +2,21 @@
 // 🔧 전역 변수 및 설정
 // =========================
 let baseLevel = 0;
-let addLevel = 0;
-let carryMode = "withCarry"; // 기본값: 받아올림 포함
+let subLevel = 0;
+let borrowMode = "withBorrow"; // 기본값
 let problems = [];
 let currentIndex = 0;
 let correctCount = 0;
 let startTime;
 
 const baseRanges = [
-  [10, 19], [20, 29], [10, 59], [40, 79], [10, 99], 
+  [10, 19], [20, 29], [30, 49], [50, 69], [70, 99], [10, 49], [50, 99]
 ];
 
-const addRanges = baseRanges; // 동일한 범위
+const subRanges = [
+  [1, 9], [10, 19], [20, 29], [30, 39], [10, 39]
+];
+
 
 const correctSound = new Audio('sounds/correct.mp3');
 const wrongSound = new Audio('sounds/wrong.mp3');
@@ -38,36 +41,40 @@ function getRandomFrom([min, max]) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function generateQuestion(baseRange, addRange) {
-  let a, b;
+function generateQuestion(baseRange, subRange) {
+  let base, sub;
   while (true) {
-    a = getRandomFrom(baseRange);
-    b = getRandomFrom(addRange);
+    base = getRandomFrom(baseRange);
+    sub = getRandomFrom(subRange);
 
-    if (carryMode === "noCarry") {
-      const unitA = a % 10;
-      const unitB = b % 10;
-      if (unitA + unitB > 9) continue; // 받아올림 없음
+    if (sub > base) continue; // 음수 방지
+
+    if (borrowMode === "noBorrow") {
+      const unitBase = base % 10;
+      const unitSub = sub % 10;
+      if (unitBase < unitSub) continue; // 받아내림 없음 조건 위반
     }
+
     break;
   }
+
   return {
-    question: `${a} + ${b}`,
-    answer: a + b,
+    question: `${base} - ${sub}`,
+    answer: base - sub,
   };
 }
 
 function generateProblems() {
   problems = [];
   for (let i = 0; i < 20; i++) {
-    problems.push(generateQuestion(baseRanges[baseLevel], addRanges[addLevel]));
+    problems.push(generateQuestion(baseRanges[baseLevel], subRanges[subLevel]));
   }
 }
 
 function generateChoices(answer) {
   const choices = new Set([answer]);
   while (choices.size < 5) {
-    let fake = answer + Math.floor(Math.random() * 21 - 10);
+    let fake = answer + Math.floor(Math.random() * 11 - 5); // ±5
     if (fake >= 0 && !choices.has(fake)) choices.add(fake);
   }
   return Array.from(choices).sort(() => Math.random() - 0.5);
@@ -152,7 +159,7 @@ function endGame() {
     baseLevel++;
     if (baseLevel >= baseRanges.length) {
       baseLevel = 0;
-      addLevel++;
+      subLevel++;
     }
   } else {
     recDiv.innerHTML = `
@@ -164,21 +171,44 @@ function endGame() {
   }
 }
 
+function updateSubButtons() {
+  const baseMax = baseRanges[baseLevel][1];
+
+  document.querySelectorAll('.select-btn[data-type="sub"]').forEach(btn => {
+    const index = parseInt(btn.dataset.index);
+    const subMax = subRanges[index][1];
+
+    if (subMax > baseMax) {
+      btn.disabled = true;
+      btn.classList.add('disabled-btn');
+      btn.classList.remove('selected');
+    } else {
+      btn.disabled = false;
+      btn.classList.remove('disabled-btn');
+    }
+  });
+}
+
+
 function startSelectedGame() {
-  if (baseLevel !== null && addLevel !== null) startGame();
+  if (baseLevel !== null && subLevel !== null) startGame();
 }
 
 function nextLevel() {
   baseLevel++;
   if (baseLevel >= baseRanges.length) {
     baseLevel = 0;
-    addLevel++;
-    if (addLevel >= addRanges.length) {
-      addLevel = 0; // 전체 다 돌았으면 처음으로
+    subLevel++;  
+    if (subLevel >= subRanges.length) {
+      subLevel = 0;
     }
   }
   startGame();
 }
+  
+
+
+
 
 function stopGame() {
   startScreen.style.display = "block";
@@ -195,14 +225,16 @@ document.querySelectorAll('.select-btn[data-type="base"]').forEach(btn => {
     btn.classList.add('selected');
     baseLevel = parseInt(btn.dataset.index);
     checkStartReady();
+        updateSubButtons(); // ✅ 여기 추가
+
   });
 });
 
-document.querySelectorAll('.select-btn[data-type="add"]').forEach(btn => {
+document.querySelectorAll('.select-btn[data-type="sub"]').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.select-btn[data-type="add"]').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('.select-btn[data-type="sub"]').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
-    addLevel = parseInt(btn.dataset.index);
+    subLevel = parseInt(btn.dataset.index);
     checkStartReady();
   });
 });
@@ -211,12 +243,12 @@ document.querySelectorAll('.mode-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
-    carryMode = btn.dataset.mode;
+    borrowMode = btn.dataset.mode;
   });
 });
 
 function checkStartReady() {
   const baseSelected = document.querySelector('.select-btn[data-type="base"].selected');
-  const addSelected = document.querySelector('.select-btn[data-type="add"].selected');
-  document.getElementById('startButton').disabled = !(baseSelected && addSelected);
+  const subSelected = document.querySelector('.select-btn[data-type="sub"].selected');
+  document.getElementById('startButton').disabled = !(baseSelected && subSelected);
 }

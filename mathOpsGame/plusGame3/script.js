@@ -3,17 +3,19 @@
 // =========================
 let baseLevel = 0;
 let addLevel = 0;
-let carryMode = "withCarry"; // 기본값: 받아올림 포함
+let carryMode = "carry2"; // 기본값: 받아올림 2번 포함
 let problems = [];
 let currentIndex = 0;
 let correctCount = 0;
 let startTime;
 
+ 
 const baseRanges = [
-  [10, 19], [20, 29], [10, 59], [40, 79], [10, 99], 
+  [100, 199], [200, 299], [100, 599], [400, 799], [100, 999]
 ];
-
-const addRanges = baseRanges; // 동일한 범위
+const addRanges = [
+  [10, 19], [20, 29], [10, 59], [40, 79], [10, 99],
+];
 
 const correctSound = new Audio('sounds/correct.mp3');
 const wrongSound = new Audio('sounds/wrong.mp3');
@@ -44,18 +46,29 @@ function generateQuestion(baseRange, addRange) {
     a = getRandomFrom(baseRange);
     b = getRandomFrom(addRange);
 
+    const unitA = a % 10;
+    const tenA = Math.floor((a % 100) / 10);
+    const unitB = b % 10;
+    const tenB = Math.floor((b % 100) / 10);
+
+    const unitSum = unitA + unitB;
+    const tenSum = tenA + tenB;
+
     if (carryMode === "noCarry") {
-      const unitA = a % 10;
-      const unitB = b % 10;
-      if (unitA + unitB > 9) continue; // 받아올림 없음
+      if (unitSum > 9 || tenSum > 9) continue;
+    } else if (carryMode === "carry1") {
+      if (unitSum > 9 && tenSum > 9) continue;
     }
+
     break;
   }
+
   return {
     question: `${a} + ${b}`,
     answer: a + b,
   };
 }
+
 
 function generateProblems() {
   problems = [];
@@ -165,7 +178,7 @@ function endGame() {
 }
 
 function startSelectedGame() {
-  if (baseLevel !== null && addLevel !== null) startGame();
+  startGame();
 }
 
 function nextLevel() {
