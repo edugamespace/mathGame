@@ -1,0 +1,112 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>자릿수 게임</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'IBM Plex Sans KR', sans-serif;
+      text-align: center;
+      background-color: #fdfdfd;
+      padding: 30px;
+    }
+
+    h1 {
+      font-size: 3rem;
+      color: #e860a9;
+      margin-bottom: 40px;
+    }
+
+    .digit-btn {
+      background-color: #ffd54f;
+      border: none;
+      padding: 16px 24px;
+      font-size: 1.5rem;
+      border-radius: 10px;
+      margin: 10px;
+      cursor: pointer;
+    }
+
+    .digit-btn:hover {
+      background-color: #ffca28;
+    }
+
+    .digit-slot {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin: 40px auto;
+    }
+
+    .slot-box {
+      width: 60px;
+      height: 80px;
+      font-size: 3rem;
+      border-bottom: 4px solid #333;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .num-btn {
+      font-size: 2rem;
+      padding: 18px;
+      border-radius: 10px;
+      border: none;
+      background-color: #ffecb3;
+      cursor: pointer;
+    }
+
+    .num-btn:hover {
+      background-color: #ffe082;
+    }
+
+    .hidden { display: none; }
+    .correct { background-color: #7dd3fc !important; }
+    .incorrect { background-color: #f87171 !important; }
+
+    #progressGrid {
+      display: grid;
+      grid-template-columns: repeat(10, 35px);
+      gap: 10px;
+      justify-content: center;
+      margin: 40px auto;
+    }
+
+    .progress-btn {
+      width: 55px;
+      height: 55px;
+      background: #ddd;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div id="startScreen">
+    <h1>자릿수 게임 단계 선택</h1>
+    <button class="digit-btn" data-digit="2">두 자릿 수</button>
+    <button class="digit-btn" data-digit="3">세 자릿 수</button>
+    <button class="digit-btn" data-digit="4">네 자릿 수</button>
+    <button class="digit-btn" data-digit="5">다섯 자릿 수</button>
+  </div>
+
+  <div id="gameArea" class="hidden">
+    <div id="progressGrid"></div>
+    <h2 id="questionText"></h2>
+    <div id="answerSlots" class="digit-slot"></div>
+    <div id="choices" class="choices"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
