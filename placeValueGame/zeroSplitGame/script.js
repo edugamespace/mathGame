@@ -159,3 +159,31 @@ function generateSmartDistractors(correct, a, b) {
   });
   return Array.from(set).slice(0, 5).sort(() => Math.random() - 0.5);
 }
+
+// ================================
+// 게임 종료
+// ================================
+function endGame() {
+  const endTime = Date.now();
+  const durationSec = Math.floor((endTime - startTime) / 1000);
+  const score = Math.round((correctCount / totalQuestions) * 100);
+
+  document.getElementById("score").textContent = `${score}점`;
+  document.getElementById("time").textContent = `${durationSec}초`;
+
+  document.getElementById("progressGrid").style.display = "none";
+  document.getElementById("questionBox").style.display = "none";
+  document.getElementById("choicesBox").style.display = "none";
+  document.getElementById("resultScreen").style.display = "block";
+
+  const recDiv = document.getElementById("recommendation");
+  recDiv.innerHTML = `
+    <button onclick="startGame()" class="result-btn-primary">다시할게요</button><br>
+    <button onclick="stopGame()" class="result-btn-secondary">그만할래요</button>
+  `;
+}
+
+function stopGame() {
+  alert("수고하셨어요! 게임을 종료합니다.");
+  location.reload();
+}
