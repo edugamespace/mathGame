@@ -5,11 +5,22 @@
   <title>make10Game</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
+   html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'IBM Plex Sans KR', 'Nanum Gothic', sans-serif;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+
     body {
-      font-family: 'Arial', sans-serif;
+      background: #fefefe;
+      color: #333;
+      padding: 30px;
       text-align: center;
-      background-color: #ffffff;
-      padding: 10px;
     }
 
     #progress-bar {
@@ -21,8 +32,8 @@
     }
 
     .progress-box {
-      width: 40px;
-      height: 40px;
+      width: 50px;
+      height: 50px;
       border-radius: 6px;
       background-color: #eee;
       cursor: pointer;

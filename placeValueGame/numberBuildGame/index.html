@@ -6,14 +6,37 @@
   <title>자릿수 덧셈 게임</title>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&family=Nanum+Gothic&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'IBM Plex Sans KR', 'Nanum Gothic', sans-serif;
-      background: #fefefe;
-      color: #333;
-      padding: 30px;
-      text-align: center;
-    }
 
+    
+   html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'IBM Plex Sans KR', 'Nanum Gothic', sans-serif;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body {
+  background: #fefefe;
+  color: #333;
+  text-align: center;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* 상단부터 정렬 */
+  min-height: 100dvh; /* 모바일 대응 (주소창 제외한 높이) */
+}
+
+#startScreen,
+#gameArea,
+#resultScreen {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
     h1 {
       font-size: 2.8rem;
       color: #e860a9;
@@ -28,19 +51,22 @@
     }
 
     .digit-btn {
-      background-color: #ffd54f;
-      border: none;
+      background-color: #f9ffa8;
+      border: 2px solid #ffffff;
       padding: 16px 24px;
       font-size: 1.5rem;
       border-radius: 10px;
-      margin: 10px;
+      margin: 6px;
       cursor: pointer;
     }
 
-    .digit-btn:hover {
-      background-color: #ffca28;
-    }
+    .digit-btn:hover,
 
+    .digit-btn.selected {
+      background-color: rgb(104, 242, 252);
+      border-color: rgb(1, 80, 250);
+      color: white;
+    }
     .mode-btn {
       background-color: #eeeeee;
       border: 2px solid #aaa;
@@ -52,16 +78,13 @@
     }
 
     .mode-btn:hover,
+
     .mode-btn.selected {
       background-color: #ffc0cb;
       border-color: #ff6d99;
       color: white;
     }
 
-.selected {
-  background-color: #f48fb1 !important;
-  color: white;
-}
 
 .start-btn {
   margin-top: 30px;
@@ -87,7 +110,7 @@
     }
 
     .slot-box {
-      width: 60px;
+      width: 80px;
       height: 80px;
       font-size: 3rem;
       border: 4px solid #aaa;
@@ -111,14 +134,14 @@
     .choices {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 16px;
+      gap: 10px;
       max-width: 500px;
       margin: 0 auto;
     }
 
     .num-btn {
       font-size: 2rem;
-      padding: 18px;
+      padding: 10px;
       border-radius: 10px;
       border: none;
       background-color: #ffecb3;
@@ -132,15 +155,15 @@
     #progressGrid {
       display: grid;
       grid-template-columns: repeat(10, 35px);
-      column-gap: 30px;
+      column-gap: 20px;
       row-gap: 10px;
       justify-content: center;
-      margin: 80px auto;
+      margin: 60px auto;
     }
 
     .progress-btn {
-      width: 55px;
-      height: 55px;
+      width: 50px;
+      height: 50px;
       background: #ddd;
       border-radius: 8px;
     }
@@ -148,16 +171,68 @@
     .correct { background-color: #0800fd !important; }
     .incorrect { background-color: #ff0303 !important; }
 
-    #resultScreen {
-      display: none;
-      margin-top: 30px;
+#questionText {
+  font-size: 3.2rem;      /* 기존보다 줄임 */
+  line-height: 1.3;
+  word-break: keep-all;   /* 숫자/기호 줄바꿈 방지 */
+  flex-wrap: wrap;        /* 필요 시 줄바꿈 허용 */
+  justify-content: center;
+  text-align: center;
+  max-width: 95vw;        /* 좁은 화면에서도 자동 줄임 */
+}
+
+
+    #score {
+      font-size: 5rem;
+      color: #00cad4;
+      font-weight: bold;
+    }
+
+    #time {
+      font-size: 2rem;
+      color: #5b5b5b;
+    }
+
+    #recommendation p {
+      font-size: 2rem;
+      margin-bottom: 40px;
+    }
+
+    .result-btn-primary {
+      background-color: #0d09ff;
+      color: white;
+      font-size: 1.6rem;
+      padding: 20px 36px;
+      border-radius: 14px;
+      margin: 12px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .result-btn-primary:hover {
+      background-color: #2563ff;
+    }
+
+    .result-btn-secondary {
+      background-color: #afafaf;
+      color: #000000;
+      font-size: 1.2rem;
+      padding: 14px 28px;
+      border-radius: 10px;
+      margin: 8px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .result-btn-secondary:hover {
+      background-color: #cccccc;
     }
   </style>
 </head>
 <body>
  <!-- 1. 설정 화면 -->
 <div id="startScreen">
-  <h1>자릿수덧셈의 단계를 선택하세요.</h1>
+  <h1>자릿수 덧셈의 단계를 선택하세요.</h1>
 
   <!-- 자릿수 버튼 -->
   <div id="digitButtons">
@@ -183,6 +258,8 @@
     <h2 id="questionText"></h2>
     <div id="answerSlots" class="digit-slot"></div>
     <div id="choices" class="choices"></div>
+      <div id="choicesContainer" class="choices"></div> <!-- ✅ 추가된 ID -->
+
   </div>
 
   <!-- 효과음 -->
@@ -205,6 +282,15 @@
 <audio id="sound-백" src="sounds/백.mp3" preload="auto"></audio>
 <audio id="sound-천" src="sounds/천.mp3" preload="auto"></audio>
 <audio id="sound-만" src="sounds/만.mp3" preload="auto"></audio>
+
+  <div id="resultScreen" style="display: none">
+    <div id="score" class="score"></div>
+    <div id="time" class="time"></div>
+    <div class="btn-group" style="margin-top: 40px">
+      <button class="result-btn-primary" onclick="restartGameFromResult()">한번 더 해볼게요</button>
+      <button class="result-btn-secondary" onclick="endGame()">그만할래요</button>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>

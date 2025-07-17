@@ -1,58 +1,66 @@
+// script.js
+const totalQuestions = 20;
+let currentIndex = 0;
+let correctCount = 0;
+let answerParts = [];
+let inputParts = [];
+let startTime;
+const COLORS = ["#ffe0e0", "#e0f0ff", "#e0ffe0", "#fff3e0", "#f0e0ff", "#e0fff9", "#f9e0ff"];
+const unitMapByDigitCount = {
+  2: ["십", ""],
+  3: ["백", "십", ""],
+  4: ["천", "백", "십", ""],
+  5: ["만", "천", "백", "십", ""]
+};
+let currentTerms = [];
 let currentDigitCount = 0;
 let gameMode = "";
-let currentAnswerDigits = [];
-let inputIndex = 0;
-let correctCount = 0;
-let currentIndex = 0;
-const startBtn = document.getElementById("startGameBtn");
-const totalQuestions = 20;
+let allQuestions = [];
 
-const unitMap = ["만", "천", "백", "십", ""];
-
-function playSound(id) {
-  const sound = document.getElementById(id);
-  if (sound) {
-    sound.currentTime = 0;
-    sound.play();
-  }
-}
-
-document.querySelectorAll(".digit-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".digit-btn").forEach(b => b.classList.remove("selected"));
-    btn.classList.add("selected");
-    currentDigitCount = parseInt(btn.dataset['digit']);
-    checkReady();
+window.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".digit-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".digit-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      currentDigitCount = parseInt(btn.dataset['digit']);
+      checkReady();
+    });
   });
-});
 
-document.querySelectorAll(".mode-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("selected"));
-    btn.classList.add("selected");
-    gameMode = btn.dataset['mode'];
-    checkReady();
+  document.querySelectorAll(".mode-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      gameMode = btn.dataset['mode'];
+      checkReady();
+    });
+  });
+
+  document.getElementById("startGameBtn").addEventListener("click", () => {
+    startGame();
   });
 });
 
 function checkReady() {
+  const startBtn = document.getElementById("startGameBtn");
   if (currentDigitCount > 0 && gameMode !== "") {
     startBtn.disabled = false;
+    startBtn.classList.remove("disabled");
+  } else {
+    startBtn.disabled = true;
+    startBtn.classList.add("disabled");
   }
 }
 
-startBtn.addEventListener("click", () => {
-  startScreen.style.display = "none";
-  gameArea.style.display = "block";
-  startGame();
-});
-
-
-
 function startGame() {
-  correctCount = 0;
+  document.getElementById("startScreen").style.display = "none";
+  document.getElementById("gameArea").style.display = "block";
+  document.getElementById("resultScreen").style.display = "none";
   currentIndex = 0;
+  correctCount = 0;
+  allQuestions = [];
   generateProgressGrid();
+  startTime = new Date();
   generateNextQuestion();
 }
 
@@ -60,132 +68,163 @@ function generateProgressGrid() {
   const grid = document.getElementById("progressGrid");
   grid.innerHTML = '';
   for (let i = 0; i < totalQuestions; i++) {
-    const btn = document.createElement("div");
-    btn.className = "progress-btn";
-    btn.id = `progress-${i}`;
-    grid.appendChild(btn);
+    const box = document.createElement("div");
+    box.className = "progress-btn";
+    box.id = `progress-${i}`;
+    box.addEventListener("click", () => {
+      if (box.classList.contains("incorrect")) {
+        retryQuestion(i);
+      }
+    });
+    grid.appendChild(box);
   }
 }
 
-function generateNextQuestion() {
-  if (currentIndex >= totalQuestions) {
-    alert(`게임 종료! 정답 수: ${correctCount}/${totalQuestions}`);
-    location.reload();
-    return;
-  }
-
-  // 자릿수 숫자 생성
-   let digits = Array.from({ length: currentDigitCount }, () => Math.floor(Math.random() * 10));
-  if (digits[0] === 0) digits[0] = Math.floor(Math.random() * 9) + 1;
-
+function generateQuestion(digits) {
   let terms = digits.map((d, i) => ({
     digit: d,
-    term: d * Math.pow(10, currentDigitCount - i - 1),
-    place: Math.pow(10, currentDigitCount - i - 1)
+    unitIndex: i,
+    used: false
   }));
 
   if (gameMode === "shuffled") {
     terms = shuffleArray(terms);
   }
 
-  // 정답: 큰 자릿수부터 내림차순으로 정렬해 digit만 추출
-  currentAnswerDigits = [...terms]
-    .sort((a, b) => b.place - a.place)
-    .map(t => t.digit);
+  const answer = [...terms].sort((a, b) => a.unitIndex - b.unitIndex).map(t => t.digit);
 
-  // 문제로는 섞인 순서대로 항만 출력
-  const question = terms.map(t => t.term).filter(n => n > 0).join(" + ");
-  document.getElementById("questionText").textContent = question + " =";
+  const placeValuesByDigitCount = {
+    2: [10, 1],
+    3: [100, 10, 1],
+    4: [1000, 100, 10, 1],
+    5: [10000, 1000, 100, 10, 1]
+  };
+  const placeValues = placeValuesByDigitCount[currentDigitCount];
 
+  const expression = terms.map((t, i) => {
+    const value = t.digit * placeValues[t.unitIndex];
+    return value.toString();
+  }).join(" + ");
+
+  return { terms, answer, expression };
+}
+
+function generateNextQuestion() {
+  if (currentIndex >= totalQuestions) {
+    const elapsed = Math.floor((new Date() - startTime) / 1000);
+    document.getElementById("gameArea").style.display = "none";
+    document.getElementById("resultScreen").style.display = "block";
+    document.getElementById("score").textContent = `${correctCount * 5}점`;
+    document.getElementById("time").textContent = `⏱ 걸린 시간: ${elapsed}초`;
+    return;
+  }
+
+  inputParts = [];
+
+  const digits = Array.from({ length: currentDigitCount }, () => Math.floor(Math.random() * 10));
+  if (digits[0] === 0) digits[0] = Math.floor(Math.random() * 9) + 1;
+
+  const q = generateQuestion(digits);
+  currentTerms = q.terms;
+  answerParts = q.answer;
+  allQuestions[currentIndex] = digits;
+
+  document.getElementById("questionText").textContent = q.expression + " =";
   renderSlots();
   renderChoices();
 }
 
-
-function shuffleArray(arr) {
-  return arr
-    .map(item => ({ ...item, sort: Math.random() }))
-    .sort((a, b) => a.sort - b.sort);
+function retryQuestion(index) {
+  inputParts = [];
+  const digits = allQuestions[index];
+  const q = generateQuestion(digits);
+  currentTerms = q.terms;
+  answerParts = q.answer;
+  document.getElementById("questionText").textContent = q.expression + " =";
+  currentIndex = index;
+  renderSlots();
+  renderChoices();
 }
 
-
-
 function renderSlots() {
-  const container = document.getElementById("answerSlots");
-  container.innerHTML = '';
-  inputIndex = 0;
-
-  for (let i = 0; i < currentAnswerDigits.length; i++) {
-    const box = document.createElement("div");
-    box.className = "slot-box";
-    box.textContent = "";
-    box.dataset.index = i;
-    container.appendChild(box);
+  const slots = document.getElementById("answerSlots");
+  slots.innerHTML = '';
+  for (let i = 0; i < currentDigitCount; i++) {
+    const div = document.createElement("div");
+    div.className = "slot-box";
+    div.id = `slot-${i}`;
+    slots.appendChild(div);
   }
 }
 
 function renderChoices() {
-  const box = document.getElementById("choices");
-  box.innerHTML = '';
-  for (let i = 0; i < 10; i++) {
+  const container = document.getElementById("choicesContainer");
+  container.innerHTML = '';
+  const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+  nums.forEach(num => {
     const btn = document.createElement("button");
+    btn.textContent = num;
     btn.className = "num-btn";
-    btn.textContent = i;
-    btn.onclick = () => handleInput(i);
-    box.appendChild(btn);
-  }
+    btn.onclick = () => handleInput(num);
+    container.appendChild(btn);
+  });
 }
-
-const correctSound = document.getElementById("correctSound");
-const wrongSound = document.getElementById("wrongSound");
 
 function handleInput(num) {
-  const slots = document.querySelectorAll(".slot-box");
-  if (inputIndex >= slots.length) return;
+  if (inputParts.length >= currentDigitCount) return;
 
-  const correct = currentAnswerDigits[inputIndex];
-  const box = slots[inputIndex];
+  const index = inputParts.length;
+  const targetSlot = document.getElementById(`slot-${index}`);
+  targetSlot.textContent = num;
+  inputParts.push(num);
 
-  box.textContent = num;
-  box.classList.remove("correct", "incorrect");
+  const unitArray = unitMapByDigitCount[currentDigitCount];
+  const unitSound = unitArray[index];
 
-  if (num === correct) {
-  box.classList.add("correct");
-  inputIndex++;
-
-  document.getElementById("correctSound").play();
-
-  if (num > 0) {
-  playSound(`sound-${num}`);
-
-  // ✅ 자릿값 재생: currentTerms에서 실제 자릿값 찾기
-  const correctTerm = currentTerms.find(t => t.digit === num && !t.used);
-  if (correctTerm) {
-    correctTerm.used = true;
-    const unitIndex = correctTerm.unitIndex;
-
-    // ✅ 자릿값이 일의자리가 아닌 경우에만 재생
-    if (unitIndex < unitMap.length - 1) {
-      const unitLabel = unitMap[unitIndex];
-      if (unitLabel) {
-        playSound(`sound-${unitLabel}`);
-      }
-    }
-  }
-}
-
-
-
-    if (inputIndex === currentAnswerDigits.length) {
-      document.getElementById(`progress-${currentIndex}`).classList.add("correct");
-      correctCount++;
-      currentIndex++;
-      setTimeout(generateNextQuestion, 800);
-    }
+ if (num !== 0) {
+  if (num === 1 && index !== currentDigitCount - 1 && unitSound !== "") {
+    // 숫자 1이고 일의 자리가 아닐 경우: 자릿값만 재생
+    playSound(unitSound);
   } else {
-    box.classList.add("incorrect");
-    document.getElementById("wrongSound").play(); // ✅ 오답 소리
+    // 숫자 소리 + 자릿값 소리
+    playSound(num);
+    if (unitSound) {
+      setTimeout(() => playSound(unitSound), 300);
+    }
   }
 }
 
 
+  if (inputParts.length === currentDigitCount) {
+    const correct = inputParts.every((v, i) => v === answerParts[i]);
+    const resultBox = document.getElementById(`progress-${currentIndex}`);
+    resultBox.classList.remove('correct', 'incorrect');
+    resultBox.classList.add(correct ? 'correct' : 'incorrect');
+    if (correct) correctCount++;
+    currentIndex++;
+    setTimeout(generateNextQuestion, 1000);
+  }
+}
+
+function playSound(id) {
+  const audio = new Audio(`./sounds/${id}.mp3`);
+  audio.play();
+}
+
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function restartGame() {
+  document.getElementById("resultScreen").style.display = "none";
+  document.getElementById("startScreen").style.display = "block";
+}
+
+function endGame() {
+  alert("게임을 종료합니다.");
+  location.reload();
+}

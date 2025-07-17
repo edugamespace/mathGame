@@ -9,13 +9,24 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&family=Nanum+Gothic&display=swap" rel="stylesheet">
   <style>
     /* 스타일은 기존 사용하던 그대로 */
+   html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'IBM Plex Sans KR', 'Nanum Gothic', sans-serif;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+
     body {
-      font-family: 'IBM Plex Sans KR', 'Nanum Gothic', sans-serif;
       background: #fefefe;
       color: #333;
       padding: 30px;
       text-align: center;
     }
+
 
     h1 {
       font-size: 2.8rem;
@@ -75,8 +86,8 @@
     }
 
     .progress-btn {
-      width: 55px;
-      height: 55px;
+      width: 50px;
+      height: 50px;
       background: #ddd;
       border: 1px solid #fffefe;
       border-radius: 8px;
