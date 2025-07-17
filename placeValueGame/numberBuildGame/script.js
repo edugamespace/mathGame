@@ -81,6 +81,14 @@ function generateProgressGrid() {
 }
 
 function generateQuestion(digits) {
+  const placeValuesByDigitCount = {
+    2: [10, 1],
+    3: [100, 10, 1],
+    4: [1000, 100, 10, 1],
+    5: [10000, 1000, 100, 10, 1]
+  };
+  const placeValues = placeValuesByDigitCount[currentDigitCount];
+
   let terms = digits.map((d, i) => ({
     digit: d,
     unitIndex: i,
@@ -93,18 +101,16 @@ function generateQuestion(digits) {
 
   const answer = [...terms].sort((a, b) => a.unitIndex - b.unitIndex).map(t => t.digit);
 
-  const placeValuesByDigitCount = {
-    2: [10, 1],
-    3: [100, 10, 1],
-    4: [1000, 100, 10, 1],
-    5: [10000, 1000, 100, 10, 1]
-  };
-  const placeValues = placeValuesByDigitCount[currentDigitCount];
-
-  const expression = terms.map((t, i) => {
-    const value = t.digit * placeValues[t.unitIndex];
-    return value.toString();
-  }).join(" + ");
+  let expression;
+  if (currentDigitCount === 2) {
+    // 두 자릿수 문제는 항상 두 항을 표시
+    expression = terms.map((t, i) => t.digit * placeValues[t.unitIndex]).join(" + ");
+  } else {
+    // 그 외에는 0이 아닌 항만 표시
+    expression = terms.map((t, i) => t.digit * placeValues[t.unitIndex])
+                      .filter(v => v !== 0)
+                      .join(" + ");
+  }
 
   return { terms, answer, expression };
 }
@@ -219,10 +225,21 @@ function shuffleArray(arr) {
   return arr;
 }
 
-function restartGame() {
+function restartGameFromResult() {
   document.getElementById("resultScreen").style.display = "none";
-  document.getElementById("startScreen").style.display = "block";
+  document.getElementById("startScreen").style.display = "none";
+  document.getElementById("gameArea").style.display = "block";
+
+  currentIndex = 0;
+  correctCount = 0;
+  allQuestions = [];
+  generateProgressGrid();
+  startTime = new Date();
+  generateNextQuestion();
 }
+
+
+
 
 function endGame() {
   alert("게임을 종료합니다.");
