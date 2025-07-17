@@ -3,7 +3,7 @@
 // =========================
 let baseLevel = 0;
 let subLevel = 0;
-let borrowMode = "withBorrow"; // 기본값
+let borrowMode = "withBorrow";
 let problems = [];
 let currentIndex = 0;
 let correctCount = 0;
@@ -12,17 +12,16 @@ let startTime;
 const baseRanges = [
   [10, 19], [20, 29], [30, 49], [50, 69], [70, 99], [10, 49], [50, 99]
 ];
-
 const subRanges = [
   [1, 9], [10, 19], [20, 29], [30, 39], [10, 39]
 ];
-
+const incorrectIndexes = new Set();
 
 const correctSound = new Audio('sounds/correct.mp3');
 const wrongSound = new Audio('sounds/wrong.mp3');
 
 // =========================
-// 📦 DOM 요소 가져오기
+// 📦 DOM 요소
 // =========================
 const startScreen = document.getElementById("startScreen");
 const gameArea = document.getElementById("gameArea");
@@ -46,18 +45,12 @@ function generateQuestion(baseRange, subRange) {
   while (true) {
     base = getRandomFrom(baseRange);
     sub = getRandomFrom(subRange);
-
-    if (sub > base) continue; // 음수 방지
-
+    if (sub > base) continue;
     if (borrowMode === "noBorrow") {
-      const unitBase = base % 10;
-      const unitSub = sub % 10;
-      if (unitBase < unitSub) continue; // 받아내림 없음 조건 위반
+      if (base % 10 < sub % 10) continue;
     }
-
     break;
   }
-
   return {
     question: `${base} - ${sub}`,
     answer: base - sub,
@@ -74,7 +67,7 @@ function generateProblems() {
 function generateChoices(answer) {
   const choices = new Set([answer]);
   while (choices.size < 5) {
-    let fake = answer + Math.floor(Math.random() * 11 - 5); // ±5
+    const fake = answer + Math.floor(Math.random() * 11 - 5);
     if (fake >= 0 && !choices.has(fake)) choices.add(fake);
   }
   return Array.from(choices).sort(() => Math.random() - 0.5);
@@ -83,10 +76,8 @@ function generateChoices(answer) {
 function showQuestion() {
   const { question, answer } = problems[currentIndex];
   questionBox.innerHTML = `<h2>${question}</h2>`;
-
-  const choices = generateChoices(answer);
   choicesBox.innerHTML = "";
-  choices.forEach((choice) => {
+  generateChoices(answer).forEach(choice => {
     const btn = document.createElement("button");
     btn.className = "choice-btn";
     btn.textContent = choice;
@@ -97,14 +88,22 @@ function showQuestion() {
 
 function checkAnswer(choice) {
   const isCorrect = choice === problems[currentIndex].answer;
-  const btn = document.querySelectorAll(".progress-btn")[currentIndex];
+  const btn = document.querySelector(`#progress-${currentIndex}`);
+  const wasIncorrect = incorrectIndexes.has(currentIndex);
+  btn.classList.remove("correct", "incorrect");
   btn.classList.add(isCorrect ? "correct" : "incorrect");
 
   if (isCorrect) {
-    correctCount++;
     correctSound.play();
+    if (wasIncorrect) {
+      correctCount++;
+      incorrectIndexes.delete(currentIndex);
+    } else if (!btn.classList.contains("correct") && !btn.classList.contains("incorrect")) {
+      correctCount++;
+    }
   } else {
     wrongSound.play();
+    incorrectIndexes.add(currentIndex);
   }
 
   currentIndex++;
@@ -134,15 +133,20 @@ function setupProgressGrid() {
   for (let i = 0; i < 20; i++) {
     const btn = document.createElement("button");
     btn.className = "progress-btn";
+    btn.id = `progress-${i}`;
+    btn.addEventListener("click", () => {
+      if (incorrectIndexes.has(i)) {
+        currentIndex = i;
+        showQuestion();
+      }
+    });
     progressGrid.appendChild(btn);
   }
 }
 
 function endGame() {
-  const endTime = new Date();
-  const durationSec = Math.round((endTime - startTime) / 1000);
+  const durationSec = Math.round((new Date() - startTime) / 1000);
   const score = Math.round((correctCount / 20) * 100);
-
   scoreEl.textContent = `${score}점`;
   timeEl.textContent = `걸린 시간: ${durationSec}초`;
 
@@ -173,11 +177,9 @@ function endGame() {
 
 function updateSubButtons() {
   const baseMax = baseRanges[baseLevel][1];
-
   document.querySelectorAll('.select-btn[data-type="sub"]').forEach(btn => {
     const index = parseInt(btn.dataset.index);
     const subMax = subRanges[index][1];
-
     if (subMax > baseMax) {
       btn.disabled = true;
       btn.classList.add('disabled-btn');
@@ -189,26 +191,23 @@ function updateSubButtons() {
   });
 }
 
-
 function startSelectedGame() {
-  if (baseLevel !== null && subLevel !== null) startGame();
+  const baseSelected = document.querySelector('.select-btn[data-type="base"].selected');
+  const subSelected = document.querySelector('.select-btn[data-type="sub"].selected');
+  if (baseSelected && subSelected) {
+    startGame();
+  }
 }
 
 function nextLevel() {
   baseLevel++;
   if (baseLevel >= baseRanges.length) {
     baseLevel = 0;
-    subLevel++;  
-    if (subLevel >= subRanges.length) {
-      subLevel = 0;
-    }
+    subLevel++;
+    if (subLevel >= subRanges.length) subLevel = 0;
   }
   startGame();
 }
-  
-
-
-
 
 function stopGame() {
   startScreen.style.display = "block";
@@ -217,7 +216,7 @@ function stopGame() {
 }
 
 // =========================
-// 🎯 버튼 이벤트 핸들러
+// 🎯 이벤트 리스너
 // =========================
 document.querySelectorAll('.select-btn[data-type="base"]').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -225,8 +224,7 @@ document.querySelectorAll('.select-btn[data-type="base"]').forEach(btn => {
     btn.classList.add('selected');
     baseLevel = parseInt(btn.dataset.index);
     checkStartReady();
-        updateSubButtons(); // ✅ 여기 추가
-
+    updateSubButtons();
   });
 });
 

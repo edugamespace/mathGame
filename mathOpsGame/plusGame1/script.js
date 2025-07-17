@@ -19,6 +19,7 @@ const addRanges = [
   [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7], [8, 8], [9, 9],
   [1, 3], [1, 5], [3, 5], [3, 9], [1, 9]
 ];
+const incorrectIndexes = new Set();
 
 const correctSound = new Audio('sounds/correct.mp3');
 const wrongSound = new Audio('sounds/wrong.mp3');
@@ -85,12 +86,22 @@ function generateProgressGrid() {
   const grid = document.getElementById("progressGrid");
   grid.innerHTML = '';
   for (let i = 0; i < totalQuestions; i++) {
-    const btn = document.createElement("div");
-    btn.className = "progress-btn";
-    btn.id = `progress-${i}`;
-    grid.appendChild(btn);
+    const box = document.createElement("div");
+    box.className = "progress-btn";
+    box.id = `progress-${i}`;
+
+    // ✅ 오답일 경우만 클릭해서 수정 가능
+    box.addEventListener("click", () => {
+      if (incorrectIndexes.has(i)) {
+        currentIndex = i;
+        generateNextQuestion(); // 기존 문제 생성 함수 호출
+      }
+    });
+
+    grid.appendChild(box);
   }
 }
+
 
 function generateNextQuestion() {
   if (currentIndex >= totalQuestions) {
@@ -132,17 +143,29 @@ function generateNextQuestion() {
     btn.style.backgroundColor = choiceColor;
 
     btn.onclick = () => {
-      const correctAnswer = (choice === correct);
-      document.getElementById(`progress-${currentIndex}`).classList.add(correctAnswer ? 'correct' : 'incorrect');
-      if (correctAnswer) {
-        correctCount++;
-        correctSound.play();
-      } else {
-        wrongSound.play();
-      }
-      currentIndex++;
-      generateNextQuestion();
-    };
+  const correctAnswer = (choice === correct);
+  const resultBox = document.getElementById(`progress-${currentIndex}`);
+
+  // 기존 색 제거
+  resultBox.classList.remove("correct", "incorrect");
+
+  // 정답 여부에 따라 새 색 추가
+  resultBox.classList.add(correctAnswer ? 'correct' : 'incorrect');
+
+  if (correctAnswer) {
+    correctCount++;
+    correctSound.play();
+    incorrectIndexes.delete(currentIndex);  // 오답 목록에서 제거
+  } else {
+    wrongSound.play();
+    incorrectIndexes.add(currentIndex);     // 오답 목록에 추가
+  }
+
+  // 다음 문제로 이동
+  currentIndex++;
+  generateNextQuestion();
+};
+
     box.appendChild(btn);
   });
 }

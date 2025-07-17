@@ -16,6 +16,7 @@ const baseRanges = [
 const addRanges = [
   [10, 19], [20, 29], [10, 59], [40, 79], [10, 99],
 ];
+const incorrectIndexes = new Set();
 
 const correctSound = new Audio('sounds/correct.mp3');
 const wrongSound = new Audio('sounds/wrong.mp3');
@@ -102,16 +103,19 @@ function showQuestion() {
 }
 
 function checkAnswer(choice) {
-  const isCorrect = choice === problems[currentIndex].answer;
-  const btn = document.querySelectorAll(".progress-btn")[currentIndex];
-  btn.classList.add(isCorrect ? "correct" : "incorrect");
+const isCorrect = choice === problems[currentIndex].answer;
+const btn = document.querySelector(`#progress-${currentIndex}`);
+btn.classList.remove("correct", "incorrect");
+btn.classList.add(isCorrect ? "correct" : "incorrect");
 
-  if (isCorrect) {
-    correctCount++;
-    correctSound.play();
-  } else {
-    wrongSound.play();
-  }
+if (isCorrect) {
+  correctCount++;
+  correctSound.play();
+  incorrectIndexes.delete(currentIndex);  // 오답에서 제거
+} else {
+  wrongSound.play();
+  incorrectIndexes.add(currentIndex);    // 오답 기록
+}
 
   currentIndex++;
   if (currentIndex < 20) {
@@ -140,9 +144,20 @@ function setupProgressGrid() {
   for (let i = 0; i < 20; i++) {
     const btn = document.createElement("button");
     btn.className = "progress-btn";
+    btn.id = `progress-${i}`;
+    
+    // 오답일 경우 클릭 시 다시 풀 수 있게
+    btn.addEventListener("click", () => {
+      if (incorrectIndexes.has(i)) {
+        currentIndex = i;
+        showQuestion(); // 다시 해당 문제 표시
+      }
+    });
+
     progressGrid.appendChild(btn);
   }
 }
+
 
 function endGame() {
   const endTime = new Date();
