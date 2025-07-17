@@ -1,0 +1,138 @@
+
+ body {
+      font-family: 'IBM Plex Sans KR', 'Nanum Gothic', sans-serif;
+      background: #fefefe;
+      color: #333;
+      padding: 30px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      color: #bc1bfc;
+      margin-bottom: 60px;
+    }
+
+
+.button-group {
+  margin: 10px 0 20px;
+}
+
+.button-group button {
+  padding: 10px 15px;
+  margin: 5px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+.button-group button:hover {
+  opacity: 0.8;
+}
+.button-group button.selected {
+  background-color: #85c1e9;
+}
+
+
+.button-group.operation button {
+  background-color: #e8f8f5;
+}
+
+.button-group.mode button {
+  background-color: #fcf3cf;
+}
+
+.button-group button:hover {
+  opacity: 0.8;
+  transform: scale(1.05);
+}
+
+.button-group button.selected {
+  border-color: #2e86c1;
+  font-weight: bold;
+}
+
+#start-game {
+  padding: 12px 24px;
+  background-color: #aed6f1;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  border: none;
+  cursor: pointer;
+}
+
+#game-screen {
+  display: none;
+  margin-top: 30px;
+}
+
+#question {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+#number-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 10px;
+  max-height: 500px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px;
+  border: 2px solid #ccc;
+  border-radius: 12px;
+}
+
+.number-btn {
+  padding: 20px 0;
+  border: 3px solid #ccc;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  background-color: white;
+}
+
+.number-btn.correct {
+  background-color: #7dd3fc;
+  color: white;
+}
+
+.number-btn.incorrect {
+  background-color: #f87171;
+  color: white;
+}
+
+.border-group-1 { border-color: #f8cfcf; }
+.border-group-2 { border-color: #f9d9b7; }
+.border-group-3 { border-color: #f7f3a4; }
+.border-group-4 { border-color: #d2f4c4; }
+.border-group-5 { border-color: #c5f6f7; }
+.border-group-6 { border-color: #c7d4f5; }
+.border-group-7 { border-color: #d6c5f3; }
+.border-group-8 { border-color: #f5c5ec; }
+.border-group-9 { border-color: #f5c5c5; }
+.border-group-10 { border-color: #f0e0c0; }
+
+#result-screen {
+  display: none;
+  margin-top: 40px;
+}
+
+#result-screen h2 {
+  margin-bottom: 20px;
+}
+
+#result-screen button {
+  padding: 12px 20px;
+  margin: 10px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-again { background-color: #a3e4d7; }
+.btn-exit { background-color: #f5b7b1; }

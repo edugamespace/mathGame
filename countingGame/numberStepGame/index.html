@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>큰 수 작은 수</title>
+  <link rel="stylesheet" href="style.css" />
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&family=Nanum+Gothic&display=swap" rel="stylesheet">
+
+</head>
+<body>
+  <h1>🐭제시된 문제를 보고 숫자를 찾는 게임입니다. 단계를 선택하세요.</h1>
+
+ 
+  <div class="button-group operation">
+    <button data-range="1,3">+1~+3</button>
+    <button data-range="1,5">+1~+5</button>
+    <button data-range="1,10">+1~+10</button>
+    <button data-range="-3,-1">-1~-3</button>
+    <button data-range="-5,-1">-1~-5</button>
+    <button data-range="-10,-1">-1~-10</button>
+    <button data-range="-1,3">-1~+3</button>
+    <button data-range="-5,5">-5~+5</button>
+    <button data-range="-10,10">-10~+10</button>
+  </div>
+
+  <div class="button-group mode" id="type-buttons">
+    <button data-type="pm">+, -</button>
+    <button data-type="bigsmall">큰 수, 작은 수</button>
+  </div>
+
+  <button id="start-game">게임 시작</button>
+
+  <div id="game-screen">
+    <div id="question"></div>
+    <div id="number-grid"></div>
+  </div>
+
+  <div id="result-screen">
+    <h2 id="final-score-text"></h2>
+    <p id="final-time-text"></p>
+    <button class="btn-again" onclick="location.reload()">다시할게요</button>
+    <button class="btn-exit" onclick="window.close()">그만할래요</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
