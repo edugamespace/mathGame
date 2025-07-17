@@ -36,9 +36,12 @@
       column-gap: 30px;
       row-gap: 10px;
       justify-content: center;
-      margin: 100px auto;
+        margin-bottom: 20px; /* ✅ 이 값을 줄이면 위 문제와의 간격이 줄어듭니다 */
+
     }
     .progress-btn {
+      width: 55px;
+      height: 55px;
       width: 50px;
       height: 50px;
       background: #ddd;
@@ -51,7 +54,7 @@
     }
 
     #questionBox {
-      font-size: 5.0rem;
+      font-size: 4.0rem;
       color: #444;
       font-weight: bold;
       margin-bottom: 20px;
@@ -100,6 +103,8 @@
       display: flex;
       justify-content: center;
       margin: 0 auto 40px;
+        margin-bottom: 20px; /* ✅ 보기 버튼과의 세로 간격 줄이기 */
+
     }
 
     .answer-box {
@@ -131,6 +136,7 @@
     .correct { background-color: #0800fd !important; }
     .incorrect { background-color: #ff0303 !important; }
 
+   
    /* 문제와 정답박스 가로정렬*/
 .question-row {
   display: flex;
@@ -141,11 +147,14 @@
 }
 
 .question-text {
+  font-size: 32px;
   font-size: 20px;
   font-weight: bold;
   color: #1500f8; 
   background-color: transparent; /* 배경 제거 */
   padding: 10px 0; /* 상하 여백만 남기기 */
+    margin-bottom: 20px; /* ✅ 이 값을 줄이면 아래 슬롯과의 간격이 줄어듭니다 */
+
 }
 
 .answer-box {
@@ -154,6 +163,7 @@
   justify-content: center;
   border: 3px solid #444;
   border-radius: 10px;
+  width: 220px; /* 너비 조정 */
   width: 200px; /* 너비 조정 */
   height: 80px;  /* 높이 조정 */
   gap:0px;
@@ -162,6 +172,7 @@
 }
 
 .slot-segment {
+  font-size: 60px;
   font-size: 50px;
   letter-spacing: 0.13em;
   font-weight: bold;
@@ -171,14 +182,14 @@
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 1px; /* 버튼 사이 간격 */
+  gap: 0.7px; /* 버튼 사이 간격 */
   margin-top: 18px;
 }
 
 .choice-btn {
-  width:140px;            /* ✅ 너비 고정 */
-  height: 70px;           /* ✅ 높이 고정 */
-  font-size: 36px;        /* 글자 크기 */
+  width:120px;            /* ✅ 너비 고정 */
+  height: 60px;           /* ✅ 높이 고정 */
+  font-size: 28px;        /* 글자 크기 */
     letter-spacing: 0.1em;   /* ✅ 자간 넓히기 */
   border-radius: 12px;    /* 둥글기 */
   border: none;
@@ -202,6 +213,18 @@
   transform: scale(1.08);
 }
 
+.result-summary {
+  margin-bottom: 40px;
+}
+
+#recommendation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+
     #score {
       font-size: 5rem;
       color: #00cad4;
@@ -213,10 +236,6 @@
       color: #5b5b5b;
     }
 
-    #recommendation p {
-      font-size: 2rem;
-      margin-bottom: 40px;
-    }
 
     .result-btn-secondary {
       background-color: #afafaf;
@@ -234,34 +253,44 @@
   </style>
 </head>
 <body>
-  <div id="startScreen">
+  <!-- 시작 화면 -->
+  <div id="startScreen" style="display: block;">
     <h1>🐣 자릿수 곱셈 게임을 시작해볼까요?</h1>
     <button class="start-btn" onclick="startGame()">게임 시작</button>
   </div>
 
- <div id="gameArea" style="display:none;">
-  <div id="progressGrid"></div>
+  <!-- 게임 영역 -->
+  <div id="gameArea" style="display: none;">
+    <div id="progressGrid"></div>
 
-  <!-- 문제와 정답칸을 나란히 표시 -->
-  <div class="question-row">
-    <div class="question-text" id="questionBox">20 × 30 =</div>
-    <div class="answer-box" id="answerBox">
-      <div class="slot-segment" id="slot-0"></div>
-      <div class="slot-segment" id="slot-1"></div>
+    <div class="question-row">
+      <div class="question-text" id="questionBox">20 × 30 =</div>
+      <div class="answer-box" id="answerBox">
+        <div class="slot-segment" id="slot-0"></div>
+        <div class="slot-segment" id="slot-1"></div>
+      </div>
     </div>
+
+    <div class="choices-row" id="numberChoices"></div>
+    <div class="choices-row" id="zeroChoices"></div>
   </div>
 
-  <div class="choices-row" id="numberChoices"></div>
-  <div class="choices-row" id="zeroChoices"></div>
+<div id="resultScreen" style="display: none;">
+  <div id="resultContent">
+    <div class="result-summary">
+      <h2 id="score"></h2>
+      <p id="time"></p>
+    </div>
+    <div id="recommendation"></div>
+  </div>
 </div>
 
 
-   <div id="resultScreen">
-    <h2 id="score"></h2>
-    <p id="time"></p>
-    <div id="recommendation"></div>
-  </div>
 
+  <!-- 스크립트 및 오디오 -->
   <script src="script.js"></script>
+  <audio id="correctSound" src="sounds/correct.mp3" preload="auto"></audio>
+  <audio id="wrongSound" src="sounds/wrong.mp3" preload="auto"></audio>
 </body>
+
 </html>

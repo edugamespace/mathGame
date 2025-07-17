@@ -1,10 +1,11 @@
-// script.js
 const totalQuestions = 20;
 let currentIndex = 0;
 let correctCount = 0;
 let answerParts = [];
 let inputParts = [];
 let startTime;
+const incorrectIndexes = new Set();
+
 const COLORS = [
   "#f59e0b", // 주황
   "#ef4444", // 빨강
@@ -14,12 +15,14 @@ const COLORS = [
   "#f97316", // 주황2
   "#2563eb"  // 파랑2
 ];
+
 function startGame() {
   document.getElementById("startScreen").style.display = "none";
   document.getElementById("gameArea").style.display = "block";
   document.getElementById("resultScreen").style.display = "none";
   currentIndex = 0;
   correctCount = 0;
+  incorrectIndexes.clear();
   generateProgressGrid();
   startTime = new Date();
   generateNextQuestion();
@@ -32,6 +35,12 @@ function generateProgressGrid() {
     const box = document.createElement("div");
     box.className = "progress-btn";
     box.id = `progress-${i}`;
+    box.addEventListener("click", () => {
+      if (incorrectIndexes.has(i)) {
+        currentIndex = i;
+        generateNextQuestion();
+      }
+    });
     grid.appendChild(box);
   }
 }
@@ -67,34 +76,21 @@ function generateNextQuestion() {
 
   answerParts = [productCore.toString(), zeroPart];
 
-// 랜덤 색 지정
-const color = COLORS[Math.floor(Math.random() * COLORS.length)];
-const questionBox = document.getElementById("questionBox");
-const answerBox = document.getElementById("answerBox");
+  const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+  const questionBox = document.getElementById("questionBox");
+  const answerBox = document.getElementById("answerBox");
+  questionBox.style.backgroundColor = "transparent";
+  questionBox.style.color = color;
+  answerBox.style.backgroundColor = "transparent";
+  answerBox.style.borderColor = color;
+  document.getElementById("slot-0").style.color = color;
+  document.getElementById("slot-1").style.color = color;
+  questionBox.innerHTML = `${a} × ${b} =`;
+  document.getElementById("slot-0").textContent = "";
+  document.getElementById("slot-1").textContent = "";
 
-// 배경 없이 텍스트 색만 적용
-questionBox.style.backgroundColor = "transparent";
-questionBox.style.color = color;
-
-// ✅ 테두리 색만 적용
-answerBox.style.backgroundColor = "transparent";
-answerBox.style.borderColor = color;
-
-// ✅ 정답 숫자 색도 문제 색과 동일하게
-document.getElementById("slot-0").style.color = color;
-document.getElementById("slot-1").style.color = color;
-
-// 문제 텍스트 채우기
-questionBox.innerHTML = `${a} × ${b} =`;
-
-// 정답칸 초기화
-document.getElementById("slot-0").textContent = "";
-document.getElementById("slot-1").textContent = "";
-
-renderNumberChoices(productCore.toString(), a, b);
-renderZeroChoices(zeroPart);
-
-
+  renderNumberChoices(productCore.toString(), a, b);
+  renderZeroChoices(zeroPart);
 }
 
 function renderNumberChoices(correctNum, a, b) {
@@ -132,8 +128,18 @@ function handleChoice(value) {
   if (inputParts.length === 2) {
     const correct = inputParts[0] === answerParts[0] && inputParts[1] === answerParts[1];
     const resultBox = document.getElementById(`progress-${currentIndex}`);
+    resultBox.classList.remove("correct", "incorrect");
     resultBox.classList.add(correct ? 'correct' : 'incorrect');
-    if (correct) correctCount++;
+
+    if (correct) {
+      document.getElementById("correctSound").play();
+      correctCount++;
+      incorrectIndexes.delete(currentIndex);
+    } else {
+      document.getElementById("wrongSound").play();
+      incorrectIndexes.add(currentIndex);
+    }
+
     currentIndex++;
     setTimeout(generateNextQuestion, 1000);
   }
@@ -160,27 +166,26 @@ function generateSmartDistractors(correct, a, b) {
   return Array.from(set).slice(0, 5).sort(() => Math.random() - 0.5);
 }
 
-// ================================
-// 게임 종료
-// ================================
 function endGame() {
   const endTime = Date.now();
   const durationSec = Math.floor((endTime - startTime) / 1000);
   const score = Math.round((correctCount / totalQuestions) * 100);
 
-  document.getElementById("score").textContent = `${score}점`;
-  document.getElementById("time").textContent = `${durationSec}초`;
+  document.getElementById("score").textContent = `점수: ${score}점`;
+  document.getElementById("time").textContent = `⏱ 걸린 시간: ${durationSec}초`;
 
   document.getElementById("progressGrid").style.display = "none";
   document.getElementById("questionBox").style.display = "none";
-  document.getElementById("choicesBox").style.display = "none";
-  document.getElementById("resultScreen").style.display = "block";
+  document.getElementById("numberChoices").style.display = "none";
+  document.getElementById("zeroChoices").style.display = "none";
 
   const recDiv = document.getElementById("recommendation");
   recDiv.innerHTML = `
     <button onclick="startGame()" class="result-btn-primary">다시할게요</button><br>
     <button onclick="stopGame()" class="result-btn-secondary">그만할래요</button>
   `;
+
+  document.getElementById("resultScreen").style.display = 'block';
 }
 
 function stopGame() {
