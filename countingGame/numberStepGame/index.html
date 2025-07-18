@@ -1,51 +1,255 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>큰 수 작은 수</title>
-  <link rel="stylesheet" href="style.css" />
-   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR&family=Nanum+Gothic&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>수의 순서 알기</title>
+  <style>
+    body {
+      font-family: 'IBM Plex Sans KR', 'Nanum Gothic', sans-serif;
+      text-align: center;
+      background-color: #fefefe;
+      padding: 30px;
+    }
+    h1 { color: #e860a9; font-size: 2.5rem; margin-bottom: 40px; }
+    h2 { font-size: 2rem; margin: 20px 0; }
 
+    .button-group {
+      margin-bottom: 30px;
+    }
+    .box-btn, .step-btn, #start-game, .choice-btn {
+      border: none;
+      border-radius: 10px;
+      padding: 14px 20px;
+      margin: 8px;
+      font-size: 1.4rem;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .box-btn { background-color: #cce5ff; color: #003366; }
+    .box-btn:hover { background-color: #99ccff; transform: scale(1.05); }
+    .box-btn.selected { background-color: #66b3ff; color: white; }
+
+    .step-btn { background-color: #d5f5e3; color: #145a32; }
+    .step-btn:hover:not(.disabled) { background-color: #abebc6; transform: scale(1.05); }
+    .step-btn.selected { background-color: #82e0aa; color: white; }
+    .step-btn.disabled { background-color: #ddd; color: #aaa; cursor: not-allowed; }
+
+    #start-game {
+      background-color: #fbd5ff;
+      color: #6a0d83;
+    }
+    #start-game:hover { background-color: #f8aaff; transform: scale(1.05); }
+
+    #gameScreen, #resultScreen {
+      display: none;
+      margin-top: 40px;
+    }
+
+    #progress-bar {
+      display: grid;
+      grid-template-columns: repeat(10, 35px);
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+    .progress-btn {
+      width: 50px;
+      height: 50px;
+      background-color: #eee;
+      border-radius: 10px;
+      line-height: 50px;
+      font-size: 1.2rem;
+    }
+    .correct { background-color: #00bfff !important; }
+    .incorrect { background-color: #ff4d4d !important; }
+
+    .add-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+
+    .choice-btn {
+      background-color: #ffe0b2;
+      font-size: 2rem;
+    }
+
+    .answer-blank {
+      background-color: #ffcdd2;
+      color: #b71c1c;
+      font-weight: bold;
+    }
+
+    #score { font-size: 3rem; color: #00cad4; }
+    #time { font-size: 1.5rem; color: #444; }
+  </style>
 </head>
 <body>
-  <h1>🐭제시된 문제를 보고 숫자를 찾는 게임입니다. 단계를 선택하세요.</h1>
-
- 
-  <div class="button-group operation">
-    <button data-range="1,3">+1~+3</button>
-    <button data-range="1,5">+1~+5</button>
-    <button data-range="1,10">+1~+10</button>
-    <button data-range="-3,-1">-1~-3</button>
-    <button data-range="-5,-1">-1~-5</button>
-    <button data-range="-10,-1">-1~-10</button>
-    <button data-range="-1,3">-1~+3</button>
-    <button data-range="-5,5">-5~+5</button>
-    <button data-range="-10,10">-10~+10</button>
+  <div id="startScreen">
+    <h1>🐰 공부할 단계를 선택하세요.</h1>
+    <div class="button-group">
+      <button class="box-btn" data-boxes="2">▢▢</button>
+      <button class="box-btn" data-boxes="3">▢▢▢</button>
+      <button class="box-btn" data-boxes="4">▢▢▢▢</button>
+      <button class="box-btn" data-boxes="5">▢▢▢▢▢</button>
+    </div>
+    <div class="button-group">
+      <button class="step-btn" data-step="+1">+1</button>
+      <button class="step-btn" data-step="+2">+2</button>
+      <button class="step-btn" data-step="-1">-1</button>
+      <button class="step-btn" data-step="-2">-2</button>
+    </div>
+    <button id="start-game">게임 시작</button>
   </div>
 
-  <div class="button-group mode" id="type-buttons">
-    <button data-type="pm">+, -</button>
-    <button data-type="bigsmall">큰 수, 작은 수</button>
+  <div id="gameScreen">
+    <div id="progress-bar"></div>
+    <h2 id="instruction"></h2>
+    <div id="boxes" class="add-row"></div>
+    <div id="choices" class="add-row"></div>
   </div>
 
-  <button id="start-game">게임 시작</button>
-
-  <div id="game-screen">
-    <div id="question"></div>
-    <div id="number-grid"></div>
+  <div id="resultScreen">
+    <h2 id="score"></h2>
+    <h3 id="time"></h3>
+    <button onclick="location.reload()">다시할래요</button>
+    <button onclick="window.close()">그만할래요</button>
   </div>
 
-  <div id="result-screen">
-    <h2 id="final-score-text"></h2>
-    <p id="final-time-text"></p>
-    <button class="btn-again" onclick="location.reload()">다시할게요</button>
-    <button class="btn-exit" onclick="window.close()">그만할래요</button>
-  </div>
+  <script>
+    let selectedBoxes = 3;
+    let selectedStep = '+1';
+    let questionIndex = 0;
+    let correctCount = 0;
+    let startTime = 0;
 
-  <script src="script.js"></script>
+    const correctSound = new Audio('sounds/correct.mp3');
+    const wrongSound = new Audio('sounds/wrong.mp3');
+
+    document.querySelectorAll('.box-btn').forEach(btn => {
+      btn.onclick = () => {
+        selectedBoxes = parseInt(btn.dataset.boxes);
+        document.querySelectorAll('.box-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        document.querySelectorAll('.step-btn').forEach(step => {
+          const val = step.dataset.step;
+          if ((val === '+2' || val === '-2') && selectedBoxes === 2) {
+            step.classList.add('disabled');
+          } else {
+            step.classList.remove('disabled');
+          }
+        });
+      };
+    });
+
+    document.querySelectorAll('.step-btn').forEach(btn => {
+      btn.onclick = () => {
+        if (btn.classList.contains('disabled')) return;
+        selectedStep = btn.dataset.step;
+        document.querySelectorAll('.step-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+      };
+    });
+
+    document.getElementById('start-game').onclick = () => {
+      document.getElementById('startScreen').style.display = 'none';
+      document.getElementById('gameScreen').style.display = 'block';
+      startTime = Date.now();
+      questionIndex = 0;
+      correctCount = 0;
+      createProgress();
+      showQuestion();
+    };
+
+    function createProgress() {
+      const bar = document.getElementById('progress-bar');
+      bar.innerHTML = '';
+      for (let i = 0; i < 20; i++) {
+        const btn = document.createElement('div');
+        btn.className = 'progress-btn';
+        bar.appendChild(btn);
+      }
+    }
+
+    function generateQuestion() {
+      const isMinus = selectedStep.includes('-');
+      const step = parseInt(selectedStep);
+      const blanks = Math.abs(step);
+      const dir = isMinus ? -1 : 1;
+      let start = Math.floor(Math.random() * 70 + 10);
+      const known = [];
+      for (let i = 0; i < selectedBoxes - blanks; i++) {
+        known.push(start);
+        start += dir;
+      }
+      const answers = [];
+      for (let i = 0; i < blanks; i++) {
+        answers.push(start);
+        start += dir;
+      }
+      return { known, answers };
+    }
+
+    function showQuestion() {
+      if (questionIndex >= 20) return showResult();
+      const { known, answers } = generateQuestion();
+      const instruction = document.getElementById('instruction');
+      const boxes = document.getElementById('boxes');
+      const choices = document.getElementById('choices');
+      boxes.innerHTML = '';
+      choices.innerHTML = '';
+
+      instruction.innerText = `${selectedStep} 숫자를 찾으세요.`;
+      known.forEach(n => {
+        const div = document.createElement('div');
+        div.className = 'progress-btn';
+        div.innerText = n;
+        boxes.appendChild(div);
+      });
+      answers.forEach(() => {
+        const blank = document.createElement('div');
+        blank.className = 'progress-btn answer-blank';
+        blank.innerText = '?';
+        boxes.appendChild(blank);
+      });
+
+      const correct = answers[answers.length - 1];
+      const set = new Set([correct]);
+      while (set.size < 5) {
+        set.add(correct + Math.floor(Math.random() * 11 - 5));
+      }
+
+      Array.from(set).sort(() => Math.random() - 0.5).forEach(choice => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.innerText = choice;
+        btn.onclick = () => {
+          if (parseInt(choice) === correct) {
+            correctSound.play();
+            document.getElementById('progress-bar').children[questionIndex].classList.add('correct');
+            correctCount++;
+          } else {
+            wrongSound.play();
+            document.getElementById('progress-bar').children[questionIndex].classList.add('incorrect');
+          }
+          questionIndex++;
+          showQuestion();
+        };
+        choices.appendChild(btn);
+      });
+    }
+
+    function showResult() {
+      document.getElementById('gameScreen').style.display = 'none';
+      document.getElementById('resultScreen').style.display = 'block';
+      const score = Math.round((correctCount / 20) * 100);
+      const time = Math.floor((Date.now() - startTime) / 1000);
+      document.getElementById('score').innerText = `점수: ${score}점 (${correctCount}/20)`;
+      document.getElementById('time').innerText = `걸린 시간: ${time}초`;
+    }
+  </script>
 </body>
 </html>
