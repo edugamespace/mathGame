@@ -73,6 +73,8 @@ function updateProgressBar() {
   }
 }
 
+
+
 function showResult() {
   const correctCount = score.filter(s => s === 'correct').length;
   const percent = Math.round((correctCount / totalQuestions) * 100);

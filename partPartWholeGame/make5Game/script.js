@@ -7,7 +7,7 @@ const placeholderImg = document.getElementById('placeholderImg');
 const container = document.getElementById('game-container');
 const celebration = document.getElementById('celebration');
 
-const results = Array(20).fill(null);
+const results = Array(20).fill(null); //20개의 정답 여부 저장
 let currentIndex = 0;
 const startTime = Date.now();
 
@@ -40,7 +40,7 @@ function updateProgressBar() {
     else if (res === false) box.classList.add('incorrect');
     box.onclick = () => {
       currentIndex = i;
-      loadProblem(i);
+      loadProblem(i); //클릭하면 해당 문제로 돌아가기
     };
     progressBar.appendChild(box);
   });
@@ -94,8 +94,8 @@ function loadProblem(index) {
         problemRight.src = selectedImg;
       }
 
-      updateProgressBar();
-      setTimeout(nextProblem, 700);
+      updateProgressBar(); //버튼 색상 업데이트
+      setTimeout(nextProblem, 700); //다음 문제로 넘어감
     };
 
     container.appendChild(img);
@@ -104,6 +104,7 @@ function loadProblem(index) {
 
 function nextProblem() {
   if (results.every(r => r !== null)) {
+    //모든 문제 완료 시 점수 계산 및 점수 화면 표시
     const score = results.filter(r => r).length;
     const finalScore = score * 5;
 
@@ -120,6 +121,7 @@ function nextProblem() {
     celebration.style.display = 'flex';
     return;
   }
+  //여기는 점수 화면
 
   if (currentIndex < results.length - 1) {
     currentIndex++;

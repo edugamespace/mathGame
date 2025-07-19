@@ -13,20 +13,22 @@ const boxesDiv = document.getElementById('boxes');
 const choicesDiv = document.getElementById('choices');
 const instruction = document.getElementById('instruction');
 
+const results = Array(20).fill(null); // 정답 여부 저장
+let problems = []; // 문제 데이터 저장
+
 // 사운드
 const sounds = {
   correct: new Audio('sounds/correct.mp3'),
   wrong: new Audio('sounds/wrong.mp3'),
 };
 
-// 박스 버튼
+// 박스 수 선택
 document.querySelectorAll('.box-btn').forEach(btn => {
   btn.onclick = () => {
     selectedBoxes = parseInt(btn.dataset.boxes);
     document.querySelectorAll('.box-btn').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
 
-    // 2칸 선택 시 +2, -2 버튼 비활성화
     document.querySelectorAll('.step-btn').forEach(stepBtn => {
       const step = stepBtn.dataset.step;
       if ((step === '+2' || step === '-2') && selectedBoxes < 3) {
@@ -40,7 +42,7 @@ document.querySelectorAll('.box-btn').forEach(btn => {
   };
 });
 
-// 단계 버튼
+// 단계 선택
 document.querySelectorAll('.step-btn').forEach(btn => {
   btn.onclick = () => {
     if (btn.disabled) return;
@@ -50,125 +52,186 @@ document.querySelectorAll('.step-btn').forEach(btn => {
   };
 });
 
-// 게임 시작
+// 게임 시작 버튼 연결 (❗버그 수정됨)
 document.getElementById('start-game').onclick = () => {
   startScreen.style.display = 'none';
   gameScreen.style.display = 'block';
   startTime = Date.now();
-  createProgress();
+  correctCount = 0;
+  questionIndex = 0;
+  problems = Array.from({ length: 20 }, () => generateQuestion());
+  updateProgressBar();
   showQuestion();
 };
 
-// 진행 표시
-function createProgress() {
-  progressBar.innerHTML = '';
-  for (let i = 0; i < 20; i++) {
-    const dot = document.createElement('button');
-    dot.className = 'progress-btn';
-    progressBar.appendChild(dot);
+// 문제 생성
+function generateQuestion() {
+  const isMinus = selectedStep.includes('-');
+  const step = parseInt(selectedStep);
+  const blanks = Math.abs(step);
+  const dir = isMinus ? -1 : 1;
+
+  let start;
+  if (isMinus) {
+    // 충분히 큰 수에서 시작해서 역방향으로 만들기
+    start = Math.floor(Math.random() * 50 + 30 + blanks);
+  } else {
+    start = Math.floor(Math.random() * 70 + 10);
   }
-}
 
-// 문제 만들기
-function generateSequence() {
-  const stepValue = parseInt(selectedStep.replace(/[^\d]/g, '')) || 1;
-  const isMinus = selectedStep.includes('-') || selectedStep.includes('작은');
-  const direction = isMinus ? -1 : 1;
-  const blanks = stepValue; // +2/-2 → 빈칸 2개
-
-  const baseStart = Math.floor(Math.random() * (100 - selectedBoxes));
-  const sequence = [];
-
+  const known = [];
   for (let i = 0; i < selectedBoxes - blanks; i++) {
-    sequence.push(baseStart + i * direction);
+    known.push(start);
+    start += dir;
   }
 
   const answers = [];
-  for (let i = 1; i <= blanks; i++) {
-    answers.push(sequence[sequence.length - 1] + i * direction);
+  for (let i = 0; i < blanks; i++) {
+    answers.push(start);
+    start += dir;
   }
 
-  return { sequence, answers };
+  const full = [...known, ...answers];
+  if (isMinus) {
+    const reversed = full.reverse();
+    return {
+      known: reversed.slice(blanks),
+      answers: reversed.slice(0, blanks),
+    };
+  } else {
+    return { known, answers };
+  }
 }
 
-// 문제 표시
+
+// 진행 바
+function updateProgressBar() {
+  progressBar.innerHTML = '';
+  results.forEach((res, i) => {
+    const box = document.createElement('div');
+    box.className = 'progress-box';
+    if (res === true) box.classList.add('correct');
+    else if (res === false) box.classList.add('incorrect');
+    box.onclick = () => {
+      questionIndex = i;
+      showQuestion();
+    };
+    progressBar.appendChild(box);
+  });
+}
+
+// 문제 화면 출력
 function showQuestion() {
   if (questionIndex >= 20) return showResult();
 
-  const { sequence, answers } = generateSequence();
+  const { known, answers } = problems[questionIndex];
   boxesDiv.innerHTML = '';
   choicesDiv.innerHTML = '';
-  instruction.innerText = `${selectedStep} 숫자를 찾으세요.`;
 
-  // 힌트 숫자
-  sequence.forEach(n => {
+  const isMinus = selectedStep.includes('-');
+  const isDoubleStep = Math.abs(parseInt(selectedStep)) === 2;
+
+if (isMinus) {
+  const blanks = Math.abs(parseInt(selectedStep)); // -1이면 1, -2이면 2
+
+  // 🔴 1) 정답칸: 항상 맨 앞에 추가
+  const answerBox = document.createElement('div');
+  answerBox.className = 'answer-blank';
+  answerBox.innerText = '';
+  boxesDiv.appendChild(answerBox);
+
+  // ⬜ 2) -2인 경우만: 회색 빈칸 추가
+  if (blanks === 2) {
+    const emptyBox = document.createElement('div');
+    emptyBox.className = 'question-box empty';
+    emptyBox.innerText = '';
+    boxesDiv.appendChild(emptyBox);
+  }
+
+  // 🔢 3) 힌트 숫자 출력 (나머지)
+  known.forEach(n => {
+    const div = document.createElement('div');
+    div.className = 'question-box';
+    div.innerText = n;
+    boxesDiv.appendChild(div);
+  });
+}
+
+
+else {
+  const blanks = Math.abs(parseInt(selectedStep)); // +1 또는 +2
+
+  // 힌트 숫자 출력
+  known.forEach(n => {
     const box = document.createElement('div');
-    box.className = 'progress-btn';
+    box.className = 'question-box';
     box.innerText = n;
     boxesDiv.appendChild(box);
   });
 
- // 빈칸 (정답 숫자 수만큼 빨간 네모로 표시)
-answers.forEach((val, idx) => {
-  const blank = document.createElement('div');
-  blank.className = 'progress-btn';
-  if (idx < answers.length - 1) {
-    // 힌트 숫자는 그대로 보여줌
-    blank.innerText = val;
-    blank.style.backgroundColor = '#eee';
-  } else {
-    // 마지막 숫자만 빈칸
-    blank.innerText = '?';
-    blank.classList.add('answer-blank');
-    blank.style.backgroundColor = 'salmon';
+  // +2일 경우: 회색 빈칸 먼저 추가
+  if (blanks === 2) {
+    const emptyBox = document.createElement('div');
+    emptyBox.className = 'question-box empty';
+    emptyBox.innerText = '';
+    boxesDiv.appendChild(emptyBox);
   }
-  boxesDiv.appendChild(blank);
-});
 
-// 정답은 항상 마지막 숫자 하나
-const correctAnswer = answers[answers.length - 1];
-const choices = new Set([correctAnswer]);
-
-// 보기 숫자 후보 생성 (정답을 기준으로 ±3 이내)
-while (choices.size < 5) {
-  const fake = correctAnswer + Math.floor(Math.random() * 7 - 3);
-  if (fake !== correctAnswer && fake > 0 && fake < 120) {
-    choices.add(fake);
-  }
+  // 빨간 정답칸 추가 (항상 마지막)
+  const answerBox = document.createElement('div');
+  answerBox.className = 'answer-blank';
+  answerBox.innerText = '';
+  boxesDiv.appendChild(answerBox);
 }
 
-// 보기 버튼 생성 (숫자 1개만 표시)
-Array.from(choices)
-  .sort(() => Math.random() - 0.5)
-  .forEach(choice => {
+
+
+  // 보기 버튼 생성
+const correct = selectedStep.includes('-') ? answers[0] : answers[answers.length - 1];
+  const set = new Set([correct]);
+  while (set.size < 5) {
+    const fake = correct + Math.floor(Math.random() * 11 - 5);
+    if (fake !== correct && fake > 0 && fake < 120) set.add(fake);
+  }
+
+  Array.from(set).sort(() => Math.random() - 0.5).forEach(choice => {
     const btn = document.createElement('button');
     btn.className = 'choice-btn';
     btn.innerText = choice;
-
     btn.onclick = () => {
-      if (Number(choice) === correctAnswer) {
+      results[questionIndex] = parseInt(choice) === correct;
+      if (results[questionIndex]) {
         correctCount++;
-        progressBar.children[questionIndex].classList.add('correct');
         sounds.correct.play();
       } else {
-        progressBar.children[questionIndex].classList.add('incorrect');
         sounds.wrong.play();
       }
+      updateProgressBar();
       questionIndex++;
       showQuestion();
     };
-
     choicesDiv.appendChild(btn);
   });
+}
 
 
-
-// 결과
+// 결과 표시
 function showResult() {
   gameScreen.style.display = 'none';
   resultScreen.style.display = 'block';
   const score = Math.round((correctCount / 20) * 100);
-  const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+  const time = Math.floor((Date.now() - startTime) / 1000);
   document.getElementById('score').innerText = `점수: ${score}점 (${correctCount}/20)`;
-  document.getElementById('time').innerText = `걸린 시간: ${timeTaken}초`;
+  document.getElementById('time').innerText = `걸린 시간: ${time}초`;
+}
+
+function goToStartScreen() {
+  resultScreen.style.display = 'none';
+  startScreen.style.display = 'block';
+  // 게임 초기화
+  questionIndex = 0;
+  correctCount = 0;
+  problems = [];
+  results.fill(null);
+  updateProgressBar();
 }
